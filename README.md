@@ -733,6 +733,19 @@ UPDATE Users SET Email = 'new_email@example.com' WHERE Username = 'username1';
 UPDATE Orders SET Status = 'Shipped' WHERE OrderID = 123;
 ```
 
+These examples illustrate how to use `UPDATE` and `DELETE` statements to modify or remove records from the tables in your PostgreSQL database.
+
+## 21. DELETE STATEMENT
+
+```sql
+DELETE FROM table_name
+WHERE condition;
+
+example
+DELETE FROM techers
+WHERE ID=102;
+```
+
 **DELETE operation:**
 
 1. Delete a user with a specific UserID:
@@ -745,19 +758,6 @@ DELETE FROM Users WHERE UserID = 1;
 
 ```sql
 DELETE FROM Orders WHERE UserID = 1;
-```
-
-These examples illustrate how to use `UPDATE` and `DELETE` statements to modify or remove records from the tables in your PostgreSQL database.
-
-## 21. DELETE STATEMENT
-
-```sql
-DELETE FROM table_name
-WHERE condition;
-
-example
-DELETE FROM techers
-WHERE ID=102;
 ```
 
 ## 22. [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
