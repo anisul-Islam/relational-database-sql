@@ -275,7 +275,7 @@ SET salary=salary+20000
 WHERE salary>=10000;
 ```
 
-## 20. DELETE STATEMENT
+## 21. DELETE STATEMENT
 
 ```sql
 DELETE FROM table_name
@@ -285,3 +285,73 @@ example
 DELETE FROM techers
 WHERE ID=102;
 ```
+
+## 22. [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+
+## 23. [Functions](https://youtu.be/hn6P4tBRaIE)
+
+## 24. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+
+## 25. PostgreSQL REST API
+
+- PostgreSQL is a RDBMS like MySQL
+- it supports sql and json
+- download PostgreSQL and node
+- psql postgres://anisul_islam@localhost:5432/anisul_islam
+- go to postgres database with the command psql -U postgres
+
+```sql
+  \l -> list of all databases
+  \c databaseName-> move a specific databaseName
+  \dt -> show all the tables in a db
+  DROP DATABASE database_name
+
+CREATE DATABASE todo_database;
+
+--\c into todo_database
+
+CREATE TABLE todo(
+  todo_id SERIAL PRIMARY KEY,
+  description VARCHAR(255)
+);
+
+SELECT *
+FROM todo;
+```
+
+CRUD operations
+CREATE - POST HTTP METHOD
+
+```sql
+INSERT INTO table_name (col1, col2, ..., coln)
+VALUES
+(val1, val2, ..., valN);
+```
+
+READ - GET HTTP METHOD
+
+```sql
+SELECT (col1, col2, ..., coln)
+FROM table_name
+WHERE condition;
+```
+
+UPDATE - PUT HTTP METHOD
+
+```sql
+UPDATE table_name
+SET col1=val1, col2=val2, ...coln=valn
+WHERE condition;
+```
+
+DELETE - DELETE HTTP METHOD
+
+```sql
+DELETE FROM table_name
+WHERE condition;
+```
+
+- install express pg nodemon
+- create server
+- create a database
+- create a table
