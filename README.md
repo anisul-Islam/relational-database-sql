@@ -432,7 +432,7 @@ These SQL commands create the necessary tables with appropriate columns and cons
 
 ### An example of SQL commands to insert data into the tables we created:
 
-1. **Inserting data into the Users table**:
+- **Inserting data into the Users table**:
 
 ```sql
 INSERT INTO Users (Username, Password, Email, FullName, Address)
@@ -447,7 +447,7 @@ INSERT INTO Users (Username, Password, Email, FullName, Address, CreatedAt) VALU
 
 ```
 
-2. **Inserting data into the Products table**:
+- **Inserting data into the Products table**:
 
 ```sql
 INSERT INTO Products (Name, Description, Price, CategoryID)
@@ -456,7 +456,7 @@ VALUES ('T-Shirt', 'Comfortable cotton t-shirt', 15.99, 1),
        ('Running Shoes', 'Lightweight running shoes', 49.99, 2);
 ```
 
-3. **Inserting data into the Orders table**:
+- **Inserting data into the Orders table**:
 
 ```sql
 INSERT INTO Orders (UserID, Status)
@@ -464,7 +464,7 @@ VALUES (1, 'Pending'),
        (2, 'Shipped');
 ```
 
-4. **Inserting data into the Categories table**:
+- **Inserting data into the Categories table**:
 
 ```sql
 INSERT INTO Categories (Name, Description)
@@ -473,7 +473,6 @@ VALUES ('Apparel', 'Clothing and accessories'),
 ```
 
 These SQL commands insert sample data into each table. Adjust the values as needed to reflect the actual data you want to populate your tables with.
-```
 
 ## 13. FIND / SELECT RECORDS
 
@@ -614,13 +613,13 @@ WHERE ID=102;
 
 **DELETE operation:**
 
-1. Delete a user with a specific UserID:
+- Delete a user with a specific UserID:
 
 ```sql
 DELETE FROM Users WHERE UserID = 1;
 ```
 
-2. Delete all orders placed by a user with a specific UserID:
+- Delete all orders placed by a user with a specific UserID:
 
 ```sql
 DELETE FROM Orders WHERE UserID = 1;
@@ -861,7 +860,275 @@ FROM Users
 GROUP BY Country;
 ```
 
-## 26. PostgreSQL REST API
+## 27. ALTER, ADD & DROP
+
+- Add a new column to the table
+
+```sql
+ALTER TABLE TableName
+ADD NewColumn DATA_TYPE(SIZE);
+
+ALTER TABLE Students
+ADD Hobby VARCHAR(100) DEFAULT 'Travelling';
+```
+
+- To delete a column or change the data type of a column from a table in SQL, you can use the `ALTER TABLE` statement with the `DROP COLUMN` clause. Here's the basic syntax:
+
+```sql
+ALTER TABLE table_name
+DROP COLUMN column_name;
+
+ALTER TABLE table_name
+ALTER COLUMN column_name new_data_type;
+```
+
+Replace `table_name` with the name of your table and `column_name` with the name of the column you want to delete.
+
+For example, if you want to delete a column named `email` from a table named `users`, you would execute:
+
+```sql
+ALTER TABLE users
+DROP COLUMN email;
+
+ALTER TABLE students
+ALTER COLUMN age FLOAT;
+```
+
+Keep in mind that dropping a column will permanently remove it and all its data from the table, so be sure to use this operation carefully. Also, make sure to back up your data before performing any alterations to your database schema.
+
+## 28. Truncate Table
+
+- Truncate table will not delete entire table just the records
+`TRUNCATE TABLE student_details` vs `DROP TABLE student_details`
+
+## 29. Joining Tables
+
+```sql
+-- create student table 
+CREATE TABLE Students (
+    StudentId INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Gender VARCHAR(50),
+    DOB DATE,
+    Age INT
+);
+
+INSERT INTO Students (StudentId, FirstName, LastName, Gender, DOB, Age) VALUES
+(1, 'John', 'Doe', 'Male', '1995-05-15', 26),
+(2, 'Jane', 'Smith', 'Female', '1998-08-20', 23),
+(3, 'Michael', 'Johnson', 'Male', '1997-03-10', 24),
+(4, 'Emily', 'Brown', 'Female', '1996-11-25', 25),
+(5, 'David', 'Williams', 'Male', '1999-06-30', 22),
+(6, 'Sarah', 'Jones', 'Female', '1994-09-05', 27),
+(8, 'Christopher', 'Davis', 'Male', '2000-02-12', 21);
+
+
+-- create Grade table 
+CREATE TABLE Grades (
+    GradeID INT PRIMARY KEY,
+    StudentID INT,
+    Course VARCHAR(50),
+    Grade VARCHAR(2)
+);
+
+INSERT INTO Grades (GradeID, StudentID, Course, Grade)
+VALUES
+    (1, 1, 'Math', 'A'),
+    (2, 1, 'Science', 'B'),
+    (3, 2, 'Math', 'B+'),
+    (4, 3, 'Math', 'C'),
+    (5, 3, 'Science', 'A-'),
+    (6, 7, 'Science', 'A-');
+
+```
+
+### joining based on condition
+
+```sql
+SELECT FirstName, LastName, Age, Course, Grade
+FROM Students,Grades
+WHERE Students.StudentId = Grades.StudentId;
+
+-- more better syntax for avoiding naming conflict by using 'fully qulaified name'
+SELECT Students.FirstName, Students.LastName, Students.Age, Grades.Course, Grades.Grade
+FROM Students,Grades
+WHERE Students.StudentId = Grades.StudentId;
+
+-- shorting the name by using Custom name
+SELECT s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s,Grades AS g
+WHERE s.StudentId = g.StudentId;
+```
+
+### joining using JOIN Clause
+
+```sql
+
+SELECT s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s JOIN Grades AS g
+ON s.StudentId = g.StudentId;
+```
+
+### Inner Join
+
+- INNER JOIN will returned only the matched records
+
+```sql
+SELECT s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s INNER JOIN Grades AS g
+ON s.StudentId = g.StudentId;
+```
+
+### Left Join
+
+- LEFT JOIN will rturns all rows from the left table (Table1), and the matched rows from the right table (Table). If there is no match, the result is NULL on the right side.
+
+```sql
+SELECT s.StudentId, s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s LEFT JOIN Grades AS g
+ON s.StudentId = g.StudentId;
+```
+
+### Right Join
+
+- RIGHT JOIN will rturns all rows from the right table (Table2), and the matched rows from the left table (Table1). If there is no match, the result is NULL on the left side.
+
+```sql
+SELECT s.StudentId, s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s RIGHT JOIN Grades AS g
+ON s.StudentId = g.StudentId;
+```
+
+### FULL Join
+
+- Returns all rows when there is a match in either table. This means it returns all the rows from the left table (Table1) and all the rows from the right table (Table2), with NULLs in the columns where there is no match.
+
+```sql
+SELECT s.StudentId, s.FirstName, s.LastName, s.Age, g.Course, g.Grade
+FROM Students AS s FULL JOIN Grades AS g
+ON s.StudentId = g.StudentId;
+```
+
+## 30. UNION and UNION ALL, INTERSECT
+
+- create 2 tables: people_visited_england and people_visited_finland
+- same number of columns and same sequences
+- union will remove duplicates records; it is slower
+- union all will not remove duplicates records; it is faster as no concerns of removing duplicates
+- find people visited both countries
+
+```sql
+SELECT Name, Gender, Age
+FROM people_visited_england
+
+UNION
+
+SELECT Name, Gender, Age
+FROM people_visited_finland
+```
+
+In SQL, the `INTERSECT` operator is used to retrieve the common rows that exist in two separate SELECT queries. It returns only the rows that appear in both result sets. Here's an example:
+
+Suppose we have two tables: `TableA` and `TableB`, each containing different sets of data.
+
+TableA:
+
+| ID | Name    |
+|----|---------|
+| 1  | John    |
+| 2  | Alice   |
+| 3  | Bob     |
+
+TableB:
+
+| ID | Name    |
+|----|---------|
+| 2  | Alice   |
+| 3  | Bob     |
+| 4  | Sarah   |
+
+Now, let's say we want to find the common names between these two tables. We can use the `INTERSECT` operator to achieve this:
+
+```sql
+SELECT Name FROM TableA
+INTERSECT
+SELECT Name FROM TableB;
+```
+
+This query will return:
+
+| Name    |
+|---------|
+| Alice   |
+| Bob     |
+
+Explanation:
+
+- The `SELECT Name FROM TableA` statement retrieves all the names from `TableA`.
+- The `SELECT Name FROM TableB` statement retrieves all the names from `TableB`.
+- The `INTERSECT` operator returns only the common names that appear in both result sets, which are "Alice" and "Bob".
+
+This demonstrates how the `INTERSECT` operator can be used to find the intersection of two sets of data in SQL.
+
+## 31. VIEW (Virtual Table)
+
+- view is a virtual table a copy of original table with the columns that you want to display
+
+```sql
+CREATE VIEW view_name AS 
+SELECT Name, Age
+FROM original_table;
+
+SELECT *
+FROM view_name;
+```
+
+- how to drop/delete a view
+`DROP VIEW view_name`
+
+- how to update view
+
+```sql
+UPDATE student_view
+SET Name = 'Fahima'
+WHERE Roll=101;
+```
+
+- how to insert new records to the view
+- how to delete records from the view
+
+## 32. DATE & Time
+
+```sql
+// for mysql
+SELECT CURDATE() 
+SELECT CURTIME()
+SELECT NOW()
+SELECT MAKEDATE(2017,312);
+SELECT DAYNAME('2017-09-14');
+SELECT MONTHNAME('2017-09-14');
+
+// for psql
+SELECT CURRENT_DATE;
+SELECT CURRENT_TIME;
+SELECT NOW();
+SELECT MAKE_DATE(2017, 312);
+SELECT TO_CHAR('2017-09-14'::DATE, 'Day');
+SELECT TO_CHAR('2017-09-14'::DATE, 'Month');
+
+-- use DAYNAME(DATE) for DOB
+SELECT DAYNAME(DOB)
+FROM TableName;
+
+-- in psql
+SELECT TO_CHAR(DOB, 'Day') AS day_of_week
+FROM TableName;
+```
+
+## 33. How to Use pgAdmin
+
+## 34. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
 - it supports sql and json
