@@ -1010,6 +1010,43 @@ FROM Students AS s FULL JOIN Grades AS g
 ON s.StudentId = g.StudentId;
 ```
 
+### Join among all the tables
+
+```sql
+-- Order Table 
+CREATE TABLE Orders(
+  OrderId SERIAL PRIMARY KEY,
+  OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  Status VARCHAR(50) DEFAULT 'Pending',
+  UserId INT,
+  ProductId INT,
+  FOREIGN KEY(UserId) REFERENCES Users(UserId),
+  FOREIGN KEY(ProductId) REFERENCES Products(ProductId)
+);
+
+INSERT INTO Orders (UserId, ProductId, Status)
+VALUES
+(2, 1, 'Pending');
+
+INSERT INTO Orders (UserId, ProductId, Status)
+VALUES
+(3, 2, 'Pending');
+
+INSERT INTO Orders (UserId, ProductId, Status)
+VALUES
+(2, 2, 'Pending');
+
+SELECT u.UserId, u.Username, u.Address, o.Status 
+FROM Users u
+INNER JOIN Orders o ON u.UserId = o.UserId;
+
+
+SELECT o.OrderId, o.Status, u.Username, u.Address, p.Name, p.Price, p.Description
+FROM Orders o
+INNER JOIN Products p ON o.ProductId = p.ProductId
+INNER JOIN Users u ON o.UserId = u.UserId;
+```
+
 ## 30. UNION and UNION ALL, INTERSECT
 
 - create 2 tables: people_visited_england and people_visited_finland
@@ -1127,6 +1164,14 @@ FROM TableName;
 ```
 
 ## 33. How to Use pgAdmin
+
+- you need to have access to psql dbms so make sure to have it already
+- download and install pgAdmin
+- create a server then connect to a database (if you do not have one then create a database)
+- UI
+- Run SQL
+- SAVE FILE
+- BROWSE OBJECT
 
 ## 34. PostgreSQL REST API
 
