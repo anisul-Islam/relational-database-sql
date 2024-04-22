@@ -488,6 +488,8 @@ These SQL commands insert sample data into each table. Adjust the values as need
   FROM table_name;
 ```
 
+## 14. SELECT and WHERE Clause
+
 To perform select operations in PostgreSQL, you can use the `SELECT` statement. Here's an example of how you can retrieve data from the `Users` table:
 
 ```sql
@@ -525,7 +527,20 @@ SELECT * FROM Orders WHERE UserID = 1;
 
 You can customize the select queries based on your specific requirements and the structure of your database tables.
 
-## 14. DISTINCT, LIMIT, ORDER BY
+- where clause allows us to find records conditionally
+
+```sql
+SELECT COL1,COL2,...COLN
+FROM table_name
+WHERE codition;
+
+example
+SELECT Name
+FROM students
+WHERE city='Tampere';
+```
+
+## 15. DISTINCT, LIMIT, ORDER BY
 
 - distinct command for avoiding repeated values, limit can return limited records
 
@@ -550,156 +565,7 @@ FROM table_name
 ORDER BY COL1, COL2,...COLN DESC ;
 ```
 
-## 15. Operators
-
-- Arithmetic operators: + - \* / %
-- Comparision or Relational operators > >= < <= = != BETWEEN
-- Logical operators: AND OR NOT IN
-
-## 16. WHERE Clause
-
-- where clause allows us to find records conditionally
-
-```sql
-SELECT COL1,COL2,...COLN
-FROM table_name
-WHERE codition;
-
-example
-SELECT Name
-FROM students
-WHERE city='Tampere';
-```
-
-## 16. RELATIONAL OPERTAORS IN SQL
-
-- BETWEEN
-
-```sql
-SELECT COL1,COL2,...COLN
-FROM table_name
-WHERE COL BETWEEN START_VALUE AND END_VALUE;
-
-example
-SELECT ID, NAME, GPA
-FROM students
-WHERE ID BETWEEN 101 AND 105;
-```
-
-## 17. LOGICAL OPERTAORS IN SQL
-
-- OR, AND, NOT, IN, LIKE
-
-```sql
-SELECT COL1,COL2,...COLN
-FROM table_name
-WHERE FIELD_NAME=VALUE OR FIELD_NAME=VALUE ...;
-
-SELECT COL1,COL2,...COLN
-FROM table_name
-WHERE FIELD_NAME=VALUE AND FIELD_NAME=VALUE ...;
-
-SELECT *
-FROM students
-WHERE city='Tampere'
-  OR city='Helsinki'
-  OR city='Oulu'
-
-SELECT *
-FROM students
-WHERE city IN ('Tampere','Helsinki','Oulu');
-
-SELECT *
-FROM students
-WHERE city NOT IN ('Tampere','Helsinki','Oulu');
-
--- like helps to search based on a pattern
-SELECT *
-FROM students;
--- find anyone name starts with s
-WHERE name LIKE '%s';
--- find anyone name ends with s
-WHERE name LIKE '%s';
--- find anyone name contains hi
-WHERE name LIKE '%hi%';
-```
-
-Sure, here are some more examples of using the `WHERE` clause in PostgreSQL:
-
-1. Retrieve users with a specific username:
-
-```sql
-SELECT * FROM Users WHERE Username = 'username1';
-```
-
-2. Retrieve users with a username containing a specific substring:
-
-```sql
-SELECT * FROM Users WHERE Username LIKE '%part_of_username%';
-```
-
-3. Retrieve users with a username starting with a specific letter:
-
-```sql
-SELECT * FROM Users WHERE Username LIKE 'A%';
-```
-
-4. Retrieve users with a username ending with a specific letter:
-
-```sql
-SELECT * FROM Users WHERE Username LIKE '%a';
-```
-
-5. Retrieve users with a username starting with a specific letter and having a certain length:
-
-```sql
-SELECT * FROM Users WHERE Username LIKE 'A%' AND LENGTH(Username) > 5;
-```
-
-6. Retrieve users created after a specific date:
-
-```sql
-SELECT * FROM Users WHERE CreatedAt > '2022-01-01';
-```
-
-7. Retrieve users created within a specific date range:
-
-```sql
-SELECT * FROM Users WHERE CreatedAt BETWEEN '2022-01-01' AND '2022-12-31';
-```
-
-These examples demonstrate various ways you can use the `WHERE` clause to filter records based on different conditions in your PostgreSQL queries.
-
-## 18. Custom name with AS Keyword
-
-```sql
-SELECT COL1 AS 'CUSTOM_NAME'
-FROM table_name;
-
-
-example1
-SELECT Roll as 'student_id'
-FROM students;
-
-example1
-SELECT Roll as id
-FROM students;
-```
-
-## 19. Constraint and AUTO_INCREMENT
-
-- When creating table we can set constraint and auto increment
-- Constraints: NOT NULL, UNIQUE, PRIMARY KEY = NOT NULL + UNIQUE, DEFAULT
-
-```sql
-CREATE TABLE TABLE_NAME N(
-  ID int NOT NULL AUTO_INCREMENT,
-  Name NOT NULL,
-)
-
-```
-
-## 20. UPDATE STATEMENT
+## 16. UPDATE STATEMENT
 
 ```sql
 UPDATE table_name
@@ -735,7 +601,7 @@ UPDATE Orders SET Status = 'Shipped' WHERE OrderID = 123;
 
 These examples illustrate how to use `UPDATE` and `DELETE` statements to modify or remove records from the tables in your PostgreSQL database.
 
-## 21. DELETE STATEMENT
+## 17. DELETE STATEMENT
 
 ```sql
 DELETE FROM table_name
@@ -760,13 +626,234 @@ DELETE FROM Users WHERE UserID = 1;
 DELETE FROM Orders WHERE UserID = 1;
 ```
 
-## 22. [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+## 18. Operators
 
-## 23. [Functions](https://youtu.be/hn6P4tBRaIE)
+- Arithmetic operators: + - \* / %
+- Comparision or Relational operators > >= < <= = != BETWEEN
+- Logical operators: AND OR NOT IN
 
-## 24. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+## 19. RELATIONAL OPERTAORS IN SQL
 
-## 25. PostgreSQL REST API
+- `SELECT * FROM Users WHERE CreatedAt > '2022-01-01';`
+
+- BETWEEN
+
+```sql
+SELECT COL1,COL2,...COLN
+FROM table_name
+WHERE COL BETWEEN START_VALUE AND END_VALUE;
+
+example
+SELECT ID, NAME, GPA
+FROM students
+WHERE ID BETWEEN 101 AND 105;
+```
+
+## 20. LOGICAL OPERTAORS IN SQL
+
+- OR, AND, NOT, IN, LIKE
+
+```sql
+SELECT COL1,COL2,...COLN
+FROM table_name
+WHERE FIELD_NAME=VALUE OR FIELD_NAME=VALUE ...;
+
+SELECT COL1,COL2,...COLN
+FROM table_name
+WHERE FIELD_NAME=VALUE AND FIELD_NAME=VALUE ...;
+
+SELECT *
+FROM students
+WHERE city='Tampere'
+  OR city='Helsinki'
+  OR city='Oulu'
+
+SELECT *
+FROM students
+WHERE city IN ('Tampere','Helsinki','Oulu');
+
+SELECT *
+FROM students
+WHERE city NOT IN ('Tampere','Helsinki','Oulu');
+
+-- like helps to search based on a pattern
+SELECT *
+FROM students;
+-- find anyone name starts with s
+WHERE name LIKE 's%';
+-- find anyone name ends with s
+WHERE name LIKE '%s';
+-- find anyone name contains hi
+WHERE name LIKE '%hi%';
+```
+
+- Retrieve users with a username containing a specific substring:
+
+```sql
+SELECT * FROM Users WHERE Username LIKE '%part_of_username%';
+```
+
+- Retrieve users with a username starting with a specific letter:
+
+```sql
+SELECT * FROM Users WHERE Username LIKE 'A%';
+```
+
+- Retrieve users with a username ending with a specific letter:
+
+```sql
+SELECT * FROM Users WHERE Username LIKE '%a';
+```
+
+- Retrieve users with a username starting with a specific letter and having a certain length:
+
+```sql
+SELECT * FROM Users WHERE Username LIKE 'A%' AND LENGTH(Username) > 5;
+```
+
+- Retrieve users created after a specific date:
+
+```sql
+SELECT * FROM Users WHERE CreatedAt > '2022-01-01';
+```
+
+- Retrieve users created within a specific date range:
+
+```sql
+SELECT * FROM Users WHERE CreatedAt BETWEEN '2022-01-01' AND '2022-12-31';
+```
+
+- Select users whose full names are not null or addresses are not null:
+`SELECT * FROM Users WHERE FullName IS NOT NULL OR Address IS NOT NULL;`
+
+These examples demonstrate various ways you can use the `WHERE` clause to filter records based on different conditions in your PostgreSQL queries.
+
+## 21. Custom name with AS Keyword
+
+```sql
+SELECT COL1 AS 'CUSTOM_NAME'
+FROM table_name;
+
+
+example1
+SELECT Roll as 'student_id'
+FROM students;
+
+example1
+SELECT Roll as id
+FROM students;
+```
+
+`SELECT Email AS UserEmail FROM Users;`
+
+## 22. Constraint and AUTO_INCREMENT
+
+- When creating table we can set constraint and auto increment
+- Constraints: NOT NULL, UNIQUE, PRIMARY KEY = NOT NULL + UNIQUE, DEFAULT
+
+```sql
+CREATE TABLE TABLE_NAME N(
+  ID int NOT NULL AUTO_INCREMENT,
+  Name NOT NULL,
+)
+```
+
+## 23. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+
+- Sub Queries: Query inside query
+
+```sql
+SELECT * FROM Products
+WHERE Price > (SELECT AVG(Price) FROM Products);
+```
+
+## 24. [Functions](https://youtu.be/hn6P4tBRaIE)
+
+- Concatenating the username and email address:
+
+```sql
+SELECT CONCAT(Username, '@', Email) AS UserEmail FROM Users;
+```
+
+- Getting the length of the username:
+
+```sql
+SELECT Username, LENGTH(Username) AS UsernameLength FROM Users;
+```
+
+- Extracting the year from the created date:
+
+```sql
+SELECT Username, EXTRACT(YEAR FROM CreatedAt) AS CreatedYear FROM Users;
+```
+
+- Converting the username to uppercase:
+
+```sql
+SELECT UPPER(Username) AS UpperCaseUsername FROM Users;
+```
+
+- Converting the username to lowercase:
+
+```sql
+SELECT LOWER(Username) AS LowerCaseUsername FROM Users;
+```
+
+- The GREATEST and LEAST functions in SQL are typically used with numeric or date/time values.
+Sure, let's consider a scenario where we want to find the user with the earliest registration date (`CreatedAt`) and the user with the latest registration date.
+
+Here's how you can use the `LEAST` and `GREATEST` functions in SQL for the `Users` table:
+
+```sql
+-- Find the user with the earliest registration date
+SELECT * FROM Users
+WHERE CreatedAt = (SELECT LEAST(CreatedAt) FROM Users);
+
+-- Find the user with the latest registration date
+SELECT * FROM Users
+WHERE CreatedAt = (SELECT GREATEST(CreatedAt) FROM Users);
+```
+
+In these queries:
+
+- `LEAST(CreatedAt)` finds the minimum value of the `CreatedAt` column.
+- `GREATEST(CreatedAt)` finds the maximum value of the `CreatedAt` column.
+- We then use subqueries to select the user(s) whose `CreatedAt` matches the result of `LEAST` or `GREATEST`.
+
+These queries will return the user(s) with the earliest and latest registration dates, respectively, from the `Users` table.
+
+## 25. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+
+- aggregate: one result in the end. AVG(), COUNT(), MAX(), MIN(), SUM()
+
+```sql
+-- Total number of users
+SELECT COUNT(*) AS TotalUsers FROM Users;
+
+-- Average age of users (assuming there's an Age column)
+SELECT AVG(Age) AS AverageAge FROM Users;
+
+-- Earliest registration date
+SELECT MIN(CreatedAt) AS EarliestRegistrationDate FROM Users;
+
+-- Latest registration date
+SELECT MAX(CreatedAt) AS LatestRegistrationDate FROM Users;
+
+-- Total number of products
+SELECT COUNT(*) AS TotalProducts FROM Products;
+
+-- Average price of products
+SELECT AVG(Price) AS AveragePrice FROM Products;
+
+-- Highest price of a product
+SELECT MAX(Price) AS HighestPrice FROM Products;
+
+-- Lowest price of a product
+SELECT MIN(Price) AS LowestPrice FROM Products;
+
+```
+
+## 26. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
 - it supports sql and json
