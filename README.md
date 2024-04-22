@@ -853,6 +853,14 @@ SELECT MIN(Price) AS LowestPrice FROM Products;
 
 ```
 
+## 26. GroupBy
+
+```sql
+SELECT Country, COUNT(UserID) AS UserCount
+FROM Users
+GROUP BY Country;
+```
+
 ## 26. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
