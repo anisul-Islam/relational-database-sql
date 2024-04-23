@@ -298,62 +298,103 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
 - here's an example of SQL commands to create tables for the entities mentioned:
 
-    1. **Users**:
+- **Users**:
 
     ```sql
     <!-- for mysql  -->
     CREATE TABLE Users (
-        UserID INT PRIMARY KEY AUTO_INCREMENT, (for mysql)
-        Username VARCHAR(50) UNIQUE NOT NULL,
-        Password VARCHAR(100) NOT NULL,
-        Email VARCHAR(100) UNIQUE NOT NULL,
-        FullName VARCHAR(100),
-        Address VARCHAR(255),
-        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      userId SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      address VARCHAR(255),
+      image VARCHAR(255),
+      isAdmin BOOLEAN DEFAULT FALSE,
+      isBanned BOOLEAN DEFAULT FALSE,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
     );
+
+
+    ALTER TABLE users
+
+    ADD COLUMN isAdmin BOOLEAN DEFAULT FALSE,
+    ADD COLUMN isBanned BOOLEAN DEFAULT FALSE;
+
     ```
 
     ```sql
     <!-- for psql -->
    CREATE TABLE Users (
-    UserID SERIAL PRIMARY KEY,
-    Username VARCHAR(50) UNIQUE NOT NULL,
-    Password VARCHAR(100) NOT NULL,
-    Email VARCHAR(100) UNIQUE NOT NULL,
-    FullName VARCHAR(100),
-    Address VARCHAR(255),
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      userId SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      address VARCHAR(255),
+      image VARCHAR(255),
+      isAdmin BOOLEAN DEFAULT FALSE,
+      isBanned BOOLEAN DEFAULT FALSE,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    ```
-    
-  - In PostgreSQL, SERIAL is a pseudo data type that automatically generates a sequence of integers for each row inserted into the table. When you define a column as SERIAL, PostgreSQL will automatically create a sequence object and associate it with the column. This sequence generates unique integer values for the column whenever a new row is inserted into the table.
 
-    2. **Products**:
+    ```
+
+    SERIAL: In PostgreSQL, SERIAL is a pseudo data type that automatically generates a sequence of integers for each row inserted into the table. When you define a column as SERIAL, PostgreSQL will automatically create a sequence object and associate it with the column. This sequence generates unique integer values for the column whenever a new row is inserted into the table.
+
+     Image type: if you're storing the actual image files in the database, you might consider using a BYTEA (byte array) data type, which is suitable for storing binary data such as images. In some databases, there are specific data types designed for storing large binary objects (LOBs) like images, such as BLOB (Binary Large Object) in MySQL or BYTEA in PostgreSQL.
+
+- **Categories**:
 
     ```sql
     <!-- for mysql -->
-    CREATE TABLE Products (
-        ProductID INT PRIMARY KEY AUTO_INCREMENT,
-        Name VARCHAR(255) NOT NULL,
-        Description TEXT,
-        Price DECIMAL(10, 2) NOT NULL,
-        CategoryID INT,
-        FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID),
-        CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    CREATE TABLE categories (
+        categoryID INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) UNIQUE NOT NULL,
+        description TEXT
     );
     ```
 
     ```sql
     <!-- for psql -->
-    CREATE TABLE Products (
-    ProductID SERIAL PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Description TEXT,
-    Price DECIMAL(10, 2) NOT NULL,
-    CategoryID INT,
-    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+    CREATE TABLE categories (
+      categoryID SERIAL PRIMARY KEY,
+      name VARCHAR(100) UNIQUE NOT NULL,
+      slug VARCHAR(100) UNIQUE NOT NULL,
+      description TEXT 
     );
+    ```
+
+- **Products**:
+
+    ```sql
+    <!-- for mysql -->
+    CREATE TABLE products (
+        productID INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10, 2) NOT NULL,
+        categoryID INT,
+        FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID),
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    ```
+
+    ```sql
+    <!-- for psql -->
+    CREATE TABLE products (
+        productID SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10, 2) NOT NULL,
+        quantity INT DEFAULT 0,
+        sold INT DEFAULT 0,
+        image VARCHAR(255),
+        shipping BOOLEAN,
+        categoryID INT REFERENCES categories(categoryID), -- Combined with foreign key constraint
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
     ```
 
     - `DECIMAL(10, 2)`: This specifies the data type of the column. `DECIMAL` is a fixed-point number with a specified precision and scale. In this case, `(10, 2)` indicates that the column can store up to 10 digits in total, with 2 digits reserved for the fractional part (decimal places).
@@ -361,10 +402,10 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     So, `Price DECIMAL(10, 2) NOT NULL` means that the `Price` column will store decimal numbers with up to 10 digits in total, where 2 digits are reserved for the fractional part (e.g., cents). Additionally, it ensures that the `Price` column cannot be null, meaning it must always contain a valid price value.
 
-    3. **Orders**:
+- **Orders**:
 
     ```sql
-    CREATE TABLE Orders (
+    CREATE TABLE orders (
         OrderID INT PRIMARY KEY AUTO_INCREMENT,
         UserID INT,
         OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -375,33 +416,26 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for psql -->
-    CREATE TABLE Orders (
-    OrderID SERIAL PRIMARY KEY,
-    UserID INT,
-    OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Status VARCHAR(20) DEFAULT 'Pending',
-    FOREIGN KEY (UserID) REFERENCES Users(UserID)
-    );
-    ```
+   -- Create the orders table
 
-    4. **Categories**:
-
-    ```sql
-    <!-- for mysql -->
-    CREATE TABLE Categories (
-        CategoryID INT PRIMARY KEY AUTO_INCREMENT,
-        Name VARCHAR(100) UNIQUE NOT NULL,
-        Description TEXT
+    CREATE TABLE orders (
+        orderID SERIAL PRIMARY KEY,
+        orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(20) DEFAULT 'Pending',
+        userID INT REFERENCES Users(UserID),
+        payment JSONB, -- Assuming payment details are stored as JSON
+        productIDs INT[], -- Array of product IDs
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-    ```
 
-    ```sql
-    <!-- for psql -->
-    CREATE TABLE Categories (
-    CategoryID SERIAL PRIMARY KEY,
-    Name VARCHAR(100) UNIQUE NOT NULL,
-    Description TEXT 
+    -- Create the junction table
+
+    CREATE TABLE order_products (
+        orderID INT REFERENCES orders(orderID),
+        productID INT REFERENCES products(productID),
+        PRIMARY KEY (orderID, productID)
     );
+
     ```
 
 These SQL commands create the necessary tables with appropriate columns and constraints to support the CRUD operations for an e-commerce application. You may need to adjust the data types and constraints based on your specific requirements and database system. Additionally, you can add more columns or constraints as needed.
@@ -435,9 +469,14 @@ These SQL commands create the necessary tables with appropriate columns and cons
 - **Inserting data into the Users table**:
 
 ```sql
-INSERT INTO Users (Username, Password, Email, FullName, Address)
-VALUES ('john_doe', 'password123', 'john@example.com', 'John Doe', '123 Main St'),
-       ('jane_smith', 'letmein', 'jane@example.com', 'Jane Smith', '456 Elm St');
+
+INSERT INTO Users (name, email, password, address, image, isAdmin, isBanned)
+VALUES 
+  ('John Doe', 'john@example.com', 'password123', '123 Main St', 'profile.jpg', TRUE, FALSE),
+  ('Alice Smith', 'alice@example.com', 'password456', '456 Elm St', 'avatar.png', FALSE, FALSE),
+  ('Bob Johnson', 'bob@example.com', 'password789', '789 Oak St', NULL, FALSE, TRUE),
+  ('Emily Davis', 'emily@example.com', 'passwordabc', NULL, 'default.jpg', FALSE, FALSE),
+  ('Michael Brown', 'michael@example.com', 'passwordxyz', '567 Pine St', 'user.png', TRUE, FALSE);
 
 -- or 
 INSERT INTO Users (Username, Password, Email, FullName, Address, CreatedAt) VALUES
@@ -447,32 +486,61 @@ INSERT INTO Users (Username, Password, Email, FullName, Address, CreatedAt) VALU
 
 ```
 
+- **Inserting data into the Categories table**:
+
+```sql
+  INSERT INTO categories (name, slug, description)
+  VALUES 
+  ('Electronics', 'electronics', 'Electronic devices and accessories'),
+  ('Clothing', 'clothing', 'Apparel and fashion accessories'),
+  ('Books', 'books', 'Fiction and non-fiction literature'),
+  ('Home Decor', 'home-decor', 'Decorative items for the home'),
+  ('Toys', 'toys', 'Children''s toys and games'); 
+```
+
 - **Inserting data into the Products table**:
 
 ```sql
-INSERT INTO Products (Name, Description, Price, CategoryID)
-VALUES ('T-Shirt', 'Comfortable cotton t-shirt', 15.99, 1),
-       ('Jeans', 'Classic denim jeans', 29.99, 1),
-       ('Running Shoes', 'Lightweight running shoes', 49.99, 2);
+INSERT INTO products (name, description, price, quantity, categoryID, createdAt)
+VALUES
+    ('Product 1 Name', 'Product 1 Description', 10.99, 100, 1, NOW()),
+    ('Product 2 Name', 'Product 2 Description', 19.99, 50, 2, NOW()),
+    -- Add more products here...
+    ('Product 20 Name', 'Product 20 Description', 5.99, 200, 4, NOW());
+
+
+  INSERT INTO products (name, slug, description, price, quantity, sold, image, shipping, categoryID, createdAt)
+VALUES 
+  ('Laptop', 'laptop', 'High-performance laptop with SSD storage', 999.99, 50, 10, 'laptop.jpg', TRUE, 1, NOW()),
+  ('Smartphone', 'smartphone', 'Latest smartphone model with 5G connectivity', 699.99, 100, 30, 'smartphone.jpg', TRUE, 1, NOW()),
+  ('T-shirt', 't-shirt', 'Cotton t-shirt with trendy design', 19.99, 200, 80, 't-shirt.jpg', TRUE, 2, NOW()),
+  ('Jeans', 'jeans', 'Denim jeans for casual wear', 39.99, 150, 60, 'jeans.jpg', TRUE, 2, NOW()),
+  ('Novel', 'novel', 'Bestselling fiction novel', 12.99, 300, 120, 'novel.jpg', TRUE, 3, NOW()),
+  ('Cookbook', 'cookbook', 'Collection of popular recipes', 24.99, 100, 40, 'cookbook.jpg', TRUE, 3, NOW()),
+  ('Throw Pillow', 'throw-pillow', 'Decorative throw pillow for couch', 29.99, 50, 20, 'throw-pillow.jpg', TRUE, 4, NOW()),
+  ('Wall Art', 'wall-art', 'Canvas wall art for home decor', 49.99, 80, 30, 'wall-art.jpg', TRUE, 4, NOW()),
+  ('Action Figure', 'action-figure', 'Collectible action figure', 14.99, 120, 50, 'action-figure.jpg', TRUE, 5, NOW()),
+  ('Board Game', 'board-game', 'Popular board game for family fun', 29.99, 70, 30, 'board-game.jpg', TRUE, 5, NOW()),
+  ('Headphones', 'headphones', 'Wireless headphones with noise cancellation', 149.99, 90, 40, 'headphones.jpg', TRUE, 1, NOW()),
+  ('Smart Watch', 'smart-watch', 'Fitness tracker smart watch', 199.99, 60, 20, 'smart-watch.jpg', TRUE, 1, NOW()),
+  ('Dress', 'dress', 'Elegant dress for special occasions', 79.99, 80, 25, 'dress.jpg', TRUE, 2, NOW()),
+  ('Sneakers', 'sneakers', 'Stylish sneakers for everyday wear', 59.99, 120, 45, 'sneakers.jpg', TRUE, 2, NOW()),
+  ('Cooking Utensils Set', 'cooking-utensils-set', 'Complete set of kitchen utensils', 49.99, 100, 35, 'cooking-utensils-set.jpg', TRUE, 4, NOW());
+
 ```
 
 - **Inserting data into the Orders table**:
 
 ```sql
-INSERT INTO Orders (UserID, Status)
-VALUES (1, 'Pending'),
-       (2, 'Shipped');
+INSERT INTO orders (orderDate, status, userID, payment, productIDs)
+VALUES
+  ('2024-04-20', 'Pending', 1, '{"method": "Credit Card", "amount": 50}', '{1, 2}'),
+  ('2024-04-21', 'Processing', 2, '{"method": "PayPal", "amount": 70}', '{3, 4, 5}'),
+  ('2024-04-22', 'Shipped', 3, '{"method": "Bank Transfer", "amount": 100}', '{1, 3, 5}'),
+  ('2024-04-23', 'Delivered', 4, '{"method": "Cash on Delivery", "amount": 80}', '{2, 4}'),
+  ('2024-04-24', 'Pending', 5, '{"method": "Credit Card", "amount": 120}', '{1, 2, 3}');
+
 ```
-
-- **Inserting data into the Categories table**:
-
-```sql
-INSERT INTO Categories (Name, Description)
-VALUES ('Apparel', 'Clothing and accessories'),
-       ('Footwear', 'Shoes and sandals');
-```
-
-These SQL commands insert sample data into each table. Adjust the values as needed to reflect the actual data you want to populate your tables with.
 
 ## 13. FIND / SELECT RECORDS
 
@@ -486,6 +554,13 @@ These SQL commands insert sample data into each table. Adjust the values as need
   SELECT *
   FROM table_name;
 ```
+
+- To visualize a PostgreSQL table nicely in the terminal, you can use the `\x` command in `psql` to toggle expanded display mode.
+  - Run the following command to enter expanded display mode `\x`
+
+  - After enabling expanded display mode, run a query to select data from your table. For example: `SELECT * FROM your_table;`
+
+  - To disable expanded display mode and return to the default display format, simply run: `\x`
 
 ## 14. SELECT and WHERE Clause
 
@@ -870,6 +945,11 @@ ADD NewColumn DATA_TYPE(SIZE);
 
 ALTER TABLE Students
 ADD Hobby VARCHAR(100) DEFAULT 'Travelling';
+
+ALTER TABLE Users
+ADD COLUMN isAdmin BOOLEAN DEFAULT FALSE,
+ADD COLUMN isBanned BOOLEAN DEFAULT FALSE;
+
 ```
 
 - To delete a column or change the data type of a column from a table in SQL, you can use the `ALTER TABLE` statement with the `DROP COLUMN` clause. Here's the basic syntax:
@@ -1018,10 +1098,8 @@ CREATE TABLE Orders(
   OrderId SERIAL PRIMARY KEY,
   OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   Status VARCHAR(50) DEFAULT 'Pending',
-  UserId INT,
-  ProductId INT,
-  FOREIGN KEY(UserId) REFERENCES Users(UserId),
-  FOREIGN KEY(ProductId) REFERENCES Products(ProductId)
+  UserId INT REFERENCES Users(UserId),
+  ProductId INT REFERENCES Products(ProductId)
 );
 
 INSERT INTO Orders (UserId, ProductId, Status)
