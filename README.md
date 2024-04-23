@@ -428,6 +428,20 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+    or 
+
+    CREATE TABLE orders (
+      orderId SERIAL PRIMARY KEY,
+      orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      status VARCHAR(100) DEFAULT 'Pending',
+      payment JSONB,
+      userId INT REFERENCES users(userId),
+      products JSONB, -- Change productIDs INT[] to products JSONB
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+    );
+
+
     -- Create the junction table
 
     CREATE TABLE order_products (
@@ -540,6 +554,12 @@ VALUES
   ('2024-04-23', 'Delivered', 4, '{"method": "Cash on Delivery", "amount": 80}', '{2, 4}'),
   ('2024-04-24', 'Pending', 5, '{"method": "Credit Card", "amount": 120}', '{1, 2, 3}');
 
+or 
+INSERT INTO orders (orderDate, status, payment, userId, products)
+VALUES
+  ('2024-04-20 10:00:00', 'Pending', '{"method": "credit card", "amount": 100}', 1, '[{"product_id": 1, "quantity": 3}, {"product_id": 2, "quantity": 1}]'),
+  ('2024-04-21 11:00:00', 'Processing', '{"method": "cash on delivery", "amount": 150}', 2, '[{"product_id": 3, "quantity": 2}]');
+
 ```
 
 ## 13. FIND / SELECT RECORDS
@@ -553,6 +573,34 @@ VALUES
   -- find all records with all the fields/columns
   SELECT *
   FROM table_name;
+```
+
+```sql
+SELECT 
+  orderId,
+  orderDate,
+  status,
+  payment,
+  userId,
+  products
+FROM 
+  orders
+WHERE 
+  orderId = 1;
+
+If you want to extract specific information from the products JSONB array, such as the product_id and quantity, you can use JSON functions like jsonb_array_elements or jsonb_array_elements_text. Here's an example:
+SELECT 
+  orderId,
+  orderDate,
+  status,
+  payment,
+  userId,
+  (jsonb_array_elements(products) ->> 'product_id')::int AS product_id,
+  (jsonb_array_elements(products) ->> 'quantity')::int AS quantity
+FROM 
+  orders
+WHERE 
+  orderId = 1;
 ```
 
 - To visualize a PostgreSQL table nicely in the terminal, you can use the `\x` command in `psql` to toggle expanded display mode.
