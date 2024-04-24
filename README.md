@@ -1,6 +1,7 @@
 # Relational Database
 
 - [My MySQL playlist](https://www.youtube.com/playlist?list=PLgH5QX0i9K3qLcx9DvVDWmNJ7riPvxzCD)
+- [PSQL Tutorial](https://www.postgresqltutorial.com/)
 
 ## 1. introduction to Database
 
@@ -255,6 +256,9 @@ Here are some common types of queries:
 - syntax for creating table
 
 ```sql
+-- Drop the existing order_products table
+DROP TABLE IF EXISTS table_name;
+
 CREATE TABLE table_name(
   col_name1 data_type(size),
   col_name2 data_type(size),
@@ -302,6 +306,7 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for mysql  -->
+    
     CREATE TABLE Users (
       userId SERIAL PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
@@ -325,7 +330,11 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for psql -->
-   CREATE TABLE Users (
+    -- Drop the existing order_products table
+
+   DROP TABLE IF EXISTS users;
+
+   CREATE TABLE users (
       userId SERIAL PRIMARY KEY,
       name VARCHAR(100) NOT NULL,
       email VARCHAR(100) UNIQUE NOT NULL,
@@ -343,10 +352,68 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
      Image type: if you're storing the actual image files in the database, you might consider using a BYTEA (byte array) data type, which is suitable for storing binary data such as images. In some databases, there are specific data types designed for storing large binary objects (LOBs) like images, such as BLOB (Binary Large Object) in MySQL or BYTEA in PostgreSQL.
 
+- **Using UUID (Universal Unique Identifier) / GUID (Globally Unique Identifier)**
+    `userId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),`
+
+    ```sql
+    <!-- for psql -->
+    -- Drop the existing order_products table
+
+   DROP TABLE IF EXISTS users;
+
+   CREATE TABLE users (
+      userId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      address VARCHAR(255),
+      image VARCHAR(255),
+      isAdmin BOOLEAN DEFAULT FALSE,
+      isBanned BOOLEAN DEFAULT FALSE,
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    ```
+
+    To ensure that the `uuid-ossp` extension is installed and enabled in your PostgreSQL database, you can follow these steps:
+
+    1. Connect to your PostgreSQL database using a client tool or command-line interface that supports executing SQL commands.
+
+    2. Check if the `uuid-ossp` extension is already installed by running the following SQL command:
+
+    ```sql
+    SELECT * FROM pg_extension WHERE extname = 'uuid-ossp';
+    ```
+
+    3. If the extension is not installed, you can install it by running the following SQL command:
+
+    ```sql
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    ```
+
+    This command will install the `uuid-ossp` extension if it's not already installed. If you encounter an error indicating that you don't have permission to create extensions, you may need to perform this action as a superuser or ask your database administrator for assistance.
+
+    4. Once the extension is installed, you can enable it for your current database by running the following SQL command:
+
+    ```sql
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
+    ```
+
+    Replace `public` with the name of the schema where you want to enable the extension if you're using a different schema.
+
+    5. After enabling the extension, you can verify that it's enabled by running the first SQL command again:
+
+    ```sql
+    SELECT * FROM pg_extension WHERE extname = 'uuid-ossp';
+    ```
+
+    You should see a row indicating that the `uuid-ossp` extension is now installed and enabled in your database.
+
 - **Categories**:
 
     ```sql
     <!-- for mysql -->
+    DROP TABLE IF EXISTS categories;
     CREATE TABLE categories (
         categoryID INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(100) UNIQUE NOT NULL,
@@ -356,8 +423,17 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for psql -->
+    DROP TABLE IF EXISTS categories;
     CREATE TABLE categories (
       categoryID SERIAL PRIMARY KEY,
+      name VARCHAR(100) UNIQUE NOT NULL,
+      slug VARCHAR(100) UNIQUE NOT NULL,
+      description TEXT 
+    );
+
+    DROP TABLE IF EXISTS categories;
+    CREATE TABLE categories (
+      categoryId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
       name VARCHAR(100) UNIQUE NOT NULL,
       slug VARCHAR(100) UNIQUE NOT NULL,
       description TEXT 
@@ -368,6 +444,7 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for mysql -->
+    DROP TABLE IF EXISTS products;
     CREATE TABLE products (
         productID INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
@@ -381,6 +458,7 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```sql
     <!-- for psql -->
+    DROP TABLE IF EXISTS products;
     CREATE TABLE products (
         productID SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -397,6 +475,23 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```
 
+    ```sql
+    DROP TABLE IF EXISTS products;
+    CREATE TABLE products (
+        productId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10, 2) NOT NULL,
+        quantity INT DEFAULT 0,
+        sold INT DEFAULT 0,
+        image VARCHAR(255),
+        shipping BOOLEAN,
+        categoryID UUID REFERENCES categories(categoryID), -- Combined with foreign key constraint
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    ```
+
     - `DECIMAL(10, 2)`: This specifies the data type of the column. `DECIMAL` is a fixed-point number with a specified precision and scale. In this case, `(10, 2)` indicates that the column can store up to 10 digits in total, with 2 digits reserved for the fractional part (decimal places).
     - `NOT NULL`: This constraint ensures that the column cannot contain null values, meaning every row must have a valid price value.
 
@@ -409,52 +504,109 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
         OrderID INT PRIMARY KEY AUTO_INCREMENT,
         UserID INT,
         OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-        Status ENUM('Pending', 'Processing', 'Shipped', 'Delivered') DEFAULT 'Pending',
+        status VARCHAR(20) DEFAULT 'Pending',
         FOREIGN KEY (UserID) REFERENCES Users(UserID)
     );
     ```
 
-    ```sql
+   ```sql
     <!-- for psql -->
-   -- Create the orders table
+   -- Create the orders table (without junction table)
 
     CREATE TABLE orders (
-        orderID SERIAL PRIMARY KEY,
+        orderId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(20) DEFAULT 'Pending',
-        userID INT REFERENCES Users(UserID),
+        <!-- userID INT REFERENCES Users(UserID), -->
+        userID UUID REFERENCES Users(UserID),
         payment JSONB, -- Assuming payment details are stored as JSON
-        productIDs INT[], -- Array of product IDs
+        productIDs UUID[], -- Array of product IDs
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
     or 
-
+     <!-- you can create your own type: `CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered');` -->
+    CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered');
     CREATE TABLE orders (
       orderId SERIAL PRIMARY KEY,
       orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      status VARCHAR(100) DEFAULT 'Pending',
+      status order_status DEFAULT 'Pending',
       payment JSONB,
       userId INT REFERENCES users(userId),
-      products JSONB, -- Change productIDs INT[] to products JSONB
+      products JSONB, -- denormalize the data and store product information directly   
       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
+    -- with the junction table : normalize and no direct access to the table without foreign key
+     CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered');
+     CREATE TABLE orders (
+        orderId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        orderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status order_status DEFAULT 'Pending',
+        userID UUID REFERENCES users(userID)
     );
 
 
     -- Create the junction table
 
     CREATE TABLE order_products (
-        orderID INT REFERENCES orders(orderID),
-        productID INT REFERENCES products(productID),
+        orderID UUID REFERENCES orders(orderID),
+        productID UUID REFERENCES products(productID),
+        quantity INT,
         PRIMARY KEY (orderID, productID)
     );
 
     ```
 
-These SQL commands create the necessary tables with appropriate columns and constraints to support the CRUD operations for an e-commerce application. You may need to adjust the data types and constraints based on your specific requirements and database system. Additionally, you can add more columns or constraints as needed.
+- you can create your own type: `CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered');`
 
-## 13. INSERT RECORDS
+## 13. ALTER, ADD & DROP
+
+- Add a new column to the table
+
+```sql
+ALTER TABLE TableName
+ADD NewColumn DATA_TYPE(SIZE);
+
+ALTER TABLE Students
+ADD Hobby VARCHAR(100) DEFAULT 'Travelling';
+
+ALTER TABLE Users
+ADD COLUMN isAdmin BOOLEAN DEFAULT FALSE,
+ADD COLUMN isBanned BOOLEAN DEFAULT FALSE;
+
+```
+
+- To delete a column or change the data type of a column from a table in SQL, you can use the `ALTER TABLE` statement with the `DROP COLUMN` clause. Here's the basic syntax:
+
+```sql
+ALTER TABLE table_name
+DROP COLUMN column_name;
+
+ALTER TABLE table_name
+ALTER COLUMN column_name new_data_type;
+```
+
+Replace `table_name` with the name of your table and `column_name` with the name of the column you want to delete.
+
+For example, if you want to delete a column named `email` from a table named `users`, you would execute:
+
+```sql
+ALTER TABLE users
+DROP COLUMN email;
+
+ALTER TABLE students
+ALTER COLUMN age FLOAT;
+```
+
+Keep in mind that dropping a column will permanently remove it and all its data from the table, so be sure to use this operation carefully. Also, make sure to back up your data before performing any alterations to your database schema.
+
+## 14. Truncate Table
+
+- Truncate table will not delete entire table just the records
+`TRUNCATE TABLE student_details` vs `DROP TABLE student_details`
+
+## 15. INSERT RECORDS
 
 - syntax for inserting records
 
@@ -484,7 +636,7 @@ These SQL commands create the necessary tables with appropriate columns and cons
 
 ```sql
 
-INSERT INTO Users (name, email, password, address, image, isAdmin, isBanned)
+INSERT INTO users (name, email, password, address, image, isAdmin, isBanned)
 VALUES 
   ('John Doe', 'john@example.com', 'password123', '123 Main St', 'profile.jpg', TRUE, FALSE),
   ('Alice Smith', 'alice@example.com', 'password456', '456 Elm St', 'avatar.png', FALSE, FALSE),
@@ -493,11 +645,9 @@ VALUES
   ('Michael Brown', 'michael@example.com', 'passwordxyz', '567 Pine St', 'user.png', TRUE, FALSE);
 
 -- or 
-INSERT INTO Users (Username, Password, Email, FullName, Address, CreatedAt) VALUES
-    ('username1', 'password1', 'user1@example.com', 'User One', 'Address One', CURRENT_TIMESTAMP),
-    ('username2', 'password2', 'user2@example.com', 'User Two', 'Address Two', CURRENT_TIMESTAMP),
-    ('username3', 'password3', 'user3@example.com', 'User Three', 'Address Three', CURRENT_TIMESTAMP);
-
+INSERT INTO users (name, email, password, address, image, isAdmin, isBanned,createdAt)
+VALUES 
+  ('John Doe', 'john@example.com', 'password123', '123 Main St', 'profile.jpg', TRUE, FALSE,CURRENT_TIMESTAMP),
 ```
 
 - **Inserting data into the Categories table**:
@@ -523,6 +673,7 @@ VALUES
     ('Product 20 Name', 'Product 20 Description', 5.99, 200, 4, NOW());
 
 
+  -- for serial data 
   INSERT INTO products (name, slug, description, price, quantity, sold, image, shipping, categoryID, createdAt)
 VALUES 
   ('Laptop', 'laptop', 'High-performance laptop with SSD storage', 999.99, 50, 10, 'laptop.jpg', TRUE, 1, NOW()),
@@ -541,20 +692,30 @@ VALUES
   ('Sneakers', 'sneakers', 'Stylish sneakers for everyday wear', 59.99, 120, 45, 'sneakers.jpg', TRUE, 2, NOW()),
   ('Cooking Utensils Set', 'cooking-utensils-set', 'Complete set of kitchen utensils', 49.99, 100, 35, 'cooking-utensils-set.jpg', TRUE, 4, NOW());
 
+  -- for uuid 
+INSERT INTO products (name, slug, description, price, quantity, sold, image, shipping, categoryID, createdAt)
+VALUES 
+  ('Laptop', 'laptop', 'High-performance laptop with SSD storage', 999.99, 50, 10, 'laptop.jpg', TRUE, '1820433f-fd1a-44c7-a168-59dd34554ca5', NOW()),
+  ('Smartphone', 'smartphone', 'Latest smartphone model with 5G connectivity', 699.99, 100, 30, 'smartphone.jpg', TRUE, '1820433f-fd1a-44c7-a168-59dd34554ca5', NOW()),
+  ('T-shirt', 't-shirt', 'Cotton t-shirt with trendy design', 19.99, 200, 80, 't-shirt.jpg', TRUE, 'f9e6f058-6c69-4133-9638-352b2b312db8', NOW()),
+  ('Jeans', 'jeans', 'Denim jeans for casual wear', 39.99, 150, 60, 'jeans.jpg', TRUE, 'f9e6f058-6c69-4133-9638-352b2b312db8', NOW()),
+  ('Novel', 'novel', 'Bestselling fiction novel', 12.99, 300, 120, 'novel.jpg', TRUE, '1d2cab81-1424-4c14-acc5-6cdc0a2a096b', NOW()),
+  ('Cookbook', 'cookbook', 'Collection of popular recipes', 24.99, 100, 40, 'cookbook.jpg', TRUE, '1d2cab81-1424-4c14-acc5-6cdc0a2a096b', NOW()),
+  ('Throw Pillow', 'throw-pillow', 'Decorative throw pillow for couch', 29.99, 50, 20, 'throw-pillow.jpg', TRUE, 'c79a747b-7741-4b5b-904d-f7ac3a372613', NOW()),
+  ('Wall Art', 'wall-art', 'Canvas wall art for home decor', 49.99, 80, 30, 'wall-art.jpg', TRUE, 'c79a747b-7741-4b5b-904d-f7ac3a372613', NOW()),
+  ('Action Figure', 'action-figure', 'Collectible action figure', 14.99, 120, 50, 'action-figure.jpg', TRUE, 'd6e297d6-10bb-430a-a774-4d84297f4bcb', NOW()),
+  ('Board Game', 'board-game', 'Popular board game for family fun', 29.99, 70, 30, 'board-game.jpg', TRUE, 'd6e297d6-10bb-430a-a774-4d84297f4bcb', NOW()),
+  ('Headphones', 'headphones', 'Wireless headphones with noise cancellation', 149.99, 90, 40, 'headphones.jpg', TRUE, '1820433f-fd1a-44c7-a168-59dd34554ca5', NOW()),
+  ('Smart Watch', 'smart-watch', 'Fitness tracker smart watch', 199.99, 60, 20, 'smart-watch.jpg', TRUE, '1820433f-fd1a-44c7-a168-59dd34554ca5', NOW()),
+  ('Dress', 'dress', 'Elegant dress for special occasions', 79.99, 80, 25, 'dress.jpg', TRUE, 'f9e6f058-6c69-4133-9638-352b2b312db8', NOW()),
+  ('Sneakers', 'sneakers', 'Stylish sneakers for everyday wear', 59.99, 120, 45, 'sneakers.jpg', TRUE, 'f9e6f058-6c69-4133-9638-352b2b312db8', NOW()),
+  ('Cooking Utensils Set', 'cooking-utensils-set', 'Complete set of kitchen utensils', 49.99, 100, 35, 'cooking-utensils-set.jpg', TRUE, 'c79a747b-7741-4b5b-904d-f7ac3a372613', NOW());
 ```
 
 - **Inserting data into the Orders table**:
 
 ```sql
-INSERT INTO orders (orderDate, status, userID, payment, productIDs)
-VALUES
-  ('2024-04-20', 'Pending', 1, '{"method": "Credit Card", "amount": 50}', '{1, 2}'),
-  ('2024-04-21', 'Processing', 2, '{"method": "PayPal", "amount": 70}', '{3, 4, 5}'),
-  ('2024-04-22', 'Shipped', 3, '{"method": "Bank Transfer", "amount": 100}', '{1, 3, 5}'),
-  ('2024-04-23', 'Delivered', 4, '{"method": "Cash on Delivery", "amount": 80}', '{2, 4}'),
-  ('2024-04-24', 'Pending', 5, '{"method": "Credit Card", "amount": 120}', '{1, 2, 3}');
-
-or 
+-- without junction table:  denormalize the data and store product information directly   
 INSERT INTO orders (orderDate, status, payment, userId, products)
 VALUES
   ('2024-04-20 10:00:00', 'Pending', '{"method": "credit card", "amount": 100}', 1, '[{"product_id": 1, "quantity": 3}, {"product_id": 2, "quantity": 1}]'),
@@ -562,7 +723,43 @@ VALUES
 
 ```
 
-## 13. FIND / SELECT RECORDS
+```sql
+-- with junction table
+-- Inserting a sample order with multiple products
+INSERT INTO orders (orderDate, status, userID) VALUES (CURRENT_TIMESTAMP, 'Pending', 'f10b0683-6e0b-45a1-95a7-909a72aa1187');
+
+-- Inserting products for the sample order
+INSERT INTO order_products (orderID, productID, quantity) VALUES
+    ('2bb5c629-c822-4b73-b75b-9fe11c39495e', '486103e3-4d54-4f0e-b91c-96561bc8f91b', 2),
+    ('2bb5c629-c822-4b73-b75b-9fe11c39495e', '4897005c-ce5f-4af1-8e82-b2e2b54e8720', 1),('2bb5c629-c822-4b73-b75b-9fe11c39495e', 'c1ab6fbc-e4e5-4e5d-b75c-868c3baa28e9', 3);
+
+-- another method
+INSERT INTO order_products (orderID, productID, quantity)
+SELECT '2bb5c629-c822-4b73-b75b-9fe11c39495e', 
+       unnest(array['486103e3-4d54-4f0e-b91c-96561bc8f91b'::uuid, '4897005c-ce5f-4af1-8e82-b2e2b54e8720'::uuid, 'c1ab6fbc-e4e5-4e5d-b75c-868c3baa28e9'::uuid]),
+       unnest(array[2, 1, 3]);
+
+-- now select the products, user based on product id
+  SELECT
+      u.name AS user_name,
+      u.email AS user_email,
+      p.name AS product_name,
+      p.price AS product_price,
+      op.quantity AS product_quantity
+  FROM
+      orders o
+  JOIN
+      order_products op ON o.orderID = op.orderID
+  JOIN
+      users u ON o.userID = u.userID
+  JOIN
+      products p ON op.productID = p.productID
+  WHERE
+      o.orderID = '2bb5c629-c822-4b73-b75b-9fe11c39495e'; 
+
+```
+
+## 16. FIND / SELECT RECORDS
 
 - syntax for selecting records
 
@@ -610,7 +807,7 @@ WHERE
 
   - To disable expanded display mode and return to the default display format, simply run: `\x`
 
-## 14. SELECT and WHERE Clause
+## 17. SELECT and WHERE Clause
 
 To perform select operations in PostgreSQL, you can use the `SELECT` statement. Here's an example of how you can retrieve data from the `Users` table:
 
@@ -662,7 +859,7 @@ FROM students
 WHERE city='Tampere';
 ```
 
-## 15. DISTINCT, LIMIT, ORDER BY
+## 18. DISTINCT, LIMIT, ORDER BY
 
 - distinct command for avoiding repeated values, limit can return limited records
 
@@ -723,7 +920,7 @@ UPDATE Orders SET Status = 'Shipped' WHERE OrderID = 123;
 
 These examples illustrate how to use `UPDATE` and `DELETE` statements to modify or remove records from the tables in your PostgreSQL database.
 
-## 17. DELETE STATEMENT
+## 19. DELETE STATEMENT
 
 ```sql
 DELETE FROM table_name
@@ -748,13 +945,13 @@ DELETE FROM Users WHERE UserID = 1;
 DELETE FROM Orders WHERE UserID = 1;
 ```
 
-## 18. Operators
+## 20. Operators
 
 - Arithmetic operators: + - \* / %
 - Comparision or Relational operators > >= < <= = != BETWEEN
 - Logical operators: AND OR NOT IN
 
-## 19. RELATIONAL OPERTAORS IN SQL
+## 21. RELATIONAL OPERTAORS IN SQL
 
 - `SELECT * FROM Users WHERE CreatedAt > '2022-01-01';`
 
@@ -771,7 +968,7 @@ FROM students
 WHERE ID BETWEEN 101 AND 105;
 ```
 
-## 20. LOGICAL OPERTAORS IN SQL
+## 22. LOGICAL OPERTAORS IN SQL
 
 - OR, AND, NOT, IN, LIKE
 
@@ -850,7 +1047,7 @@ SELECT * FROM Users WHERE CreatedAt BETWEEN '2022-01-01' AND '2022-12-31';
 
 These examples demonstrate various ways you can use the `WHERE` clause to filter records based on different conditions in your PostgreSQL queries.
 
-## 21. Custom name with AS Keyword
+## 23. Custom name with AS Keyword
 
 ```sql
 SELECT COL1 AS 'CUSTOM_NAME'
@@ -868,7 +1065,16 @@ FROM students;
 
 `SELECT Email AS UserEmail FROM Users;`
 
-## 22. Constraint and AUTO_INCREMENT
+## 24. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+
+- Sub Queries: Query inside query
+
+```sql
+SELECT * FROM Products
+WHERE Price > (SELECT AVG(Price) FROM Products);
+```
+
+## 25. Constraint and AUTO_INCREMENT
 
 - When creating table we can set constraint and auto increment
 - Constraints: NOT NULL, UNIQUE, PRIMARY KEY = NOT NULL + UNIQUE, DEFAULT
@@ -880,16 +1086,7 @@ CREATE TABLE TABLE_NAME N(
 )
 ```
 
-## 23. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
-
-- Sub Queries: Query inside query
-
-```sql
-SELECT * FROM Products
-WHERE Price > (SELECT AVG(Price) FROM Products);
-```
-
-## 24. [Functions](https://youtu.be/hn6P4tBRaIE)
+## 26. [Functions](https://youtu.be/hn6P4tBRaIE)
 
 - Concatenating the username and email address:
 
@@ -944,7 +1141,7 @@ In these queries:
 
 These queries will return the user(s) with the earliest and latest registration dates, respectively, from the `Users` table.
 
-## 25. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+## 27. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
 
 - aggregate: one result in the end. AVG(), COUNT(), MAX(), MIN(), SUM()
 
@@ -975,59 +1172,13 @@ SELECT MIN(Price) AS LowestPrice FROM Products;
 
 ```
 
-## 26. GroupBy
+## 28. GroupBy
 
 ```sql
 SELECT Country, COUNT(UserID) AS UserCount
 FROM Users
 GROUP BY Country;
 ```
-
-## 27. ALTER, ADD & DROP
-
-- Add a new column to the table
-
-```sql
-ALTER TABLE TableName
-ADD NewColumn DATA_TYPE(SIZE);
-
-ALTER TABLE Students
-ADD Hobby VARCHAR(100) DEFAULT 'Travelling';
-
-ALTER TABLE Users
-ADD COLUMN isAdmin BOOLEAN DEFAULT FALSE,
-ADD COLUMN isBanned BOOLEAN DEFAULT FALSE;
-
-```
-
-- To delete a column or change the data type of a column from a table in SQL, you can use the `ALTER TABLE` statement with the `DROP COLUMN` clause. Here's the basic syntax:
-
-```sql
-ALTER TABLE table_name
-DROP COLUMN column_name;
-
-ALTER TABLE table_name
-ALTER COLUMN column_name new_data_type;
-```
-
-Replace `table_name` with the name of your table and `column_name` with the name of the column you want to delete.
-
-For example, if you want to delete a column named `email` from a table named `users`, you would execute:
-
-```sql
-ALTER TABLE users
-DROP COLUMN email;
-
-ALTER TABLE students
-ALTER COLUMN age FLOAT;
-```
-
-Keep in mind that dropping a column will permanently remove it and all its data from the table, so be sure to use this operation carefully. Also, make sure to back up your data before performing any alterations to your database schema.
-
-## 28. Truncate Table
-
-- Truncate table will not delete entire table just the records
-`TRUNCATE TABLE student_details` vs `DROP TABLE student_details`
 
 ## 29. Joining Tables
 
@@ -1289,7 +1440,114 @@ SELECT TO_CHAR(DOB, 'Day') AS day_of_week
 FROM TableName;
 ```
 
-## 33. How to Use pgAdmin
+## 33. [Indexing](https://www.postgresqltutorial.com/postgresql-indexes/postgresql-create-index/)
+
+Indexing is a database optimization technique used to improve the performance of queries by allowing the database engine to quickly locate rows in a table that match certain criteria. Here are some reasons why indexing is important:
+
+1. **Faster Data Retrieval**: Indexes provide a quick path to the data, allowing the database engine to locate and retrieve rows more efficiently. Without indexes, the database engine would need to scan the entire table sequentially, which can be slow, especially for large tables.
+
+2. **Improved Query Performance**: Queries that involve filtering, sorting, or joining data often benefit from indexes. Indexes allow the database engine to quickly identify and access the rows that satisfy the query conditions, resulting in faster query execution times.
+
+3. **Support for Constraints**: Indexes are often used to enforce constraints such as primary key or unique constraints. These constraints ensure data integrity and prevent duplicate or null values in key columns.
+
+4. **Optimized Join Operations**: Indexes can be used to optimize join operations between tables by providing efficient access paths to the joined columns.
+
+5. **Reduced Disk I/O**: By storing index data in a separate structure, indexes reduce the amount of disk I/O required to retrieve data, which can lead to overall performance improvements, especially in disk-bound systems.
+
+Overall, indexing plays a crucial role in database performance tuning and is essential for improving the responsiveness and scalability of database applications. However, it's important to carefully consider the indexing strategy and avoid over-indexing, as indexes come with overhead in terms of storage space and maintenance costs.
+
+- create single column index: `CREATE INDEX index_name ON table_name (column_name);`
+- create multiple column index: `CREATE INDEX index_name ON table_name (column1_name, column2_name);`
+- better syntax
+
+  ```sql
+    CREATE INDEX [IF NOT EXISTS] index_name
+    ON table_name(column1, column2, ...);
+  ```
+
+- drop index: `DROP INDEX index_name;`
+
+- check existing indexes
+
+```sql
+SELECT * 
+FROM pg_indexes 
+WHERE tablename = 'users';
+
+```
+
+```sql
+-- Create the Users table
+CREATE TABLE users (
+    userID SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    address VARCHAR(255),
+    image VARCHAR(255),
+    isAdmin BOOLEAN DEFAULT FALSE,
+    isBanned BOOLEAN DEFAULT FALSE,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert records into the Users table
+INSERT INTO users (name, email, password, address, isAdmin, isBanned, createdAt)
+VALUES
+    ('Emily Wilson', 'emily@example.com', 'password123', '123 Oak St', false, false, CURRENT_TIMESTAMP),
+    ('James Brown', 'james@example.com', 'password456', '456 Maple St', false, false, CURRENT_TIMESTAMP),
+    ('Olivia Davis', 'olivia@example.com', 'password789', '789 Elm St', false, false, CURRENT_TIMESTAMP),
+    ('Liam Johnson', 'liam@example.com', 'passwordabc', '123 Pine St', false, false, CURRENT_TIMESTAMP),
+    ('Ava Garcia', 'ava@example.com', 'passworddef', '456 Oak St', false, false, CURRENT_TIMESTAMP),
+    ('Noah Martinez', 'noah@example.com', 'password123', '789 Maple St', false, false, CURRENT_TIMESTAMP),
+    ('Isabella Rodriguez', 'isabella@example.com', 'password456', '123 Cedar St', false, false, CURRENT_TIMESTAMP),
+    ('William Hernandez', 'william@example.com', 'password789', '456 Pine St', false, false, CURRENT_TIMESTAMP),
+    ('Sophia Lopez', 'sophia@example.com', 'passwordabc', '789 Cedar St', false, false, CURRENT_TIMESTAMP),
+    ('Benjamin Lewis', 'benjamin@example.com', 'passworddef', '123 Elm St', false, false, CURRENT_TIMESTAMP),
+    ('Charlotte Perez', 'charlotte@example.com', 'password123', '456 Pine St', false, false, CURRENT_TIMESTAMP),
+    ('Mason Gonzalez', 'mason@example.com', 'password456', '789 Cedar St', false, false, CURRENT_TIMESTAMP),
+    ('Amelia Moore', 'amelia@example.com', 'password789', '123 Oak St', false, false, CURRENT_TIMESTAMP),
+    ('Ethan Watson', 'ethan@example.com', 'passwordabc', '456 Maple St', false, false, CURRENT_TIMESTAMP),
+    ('Harper Cook', 'harper@example.com', 'passworddef', '789 Elm St', false, false, CURRENT_TIMESTAMP),
+    ('Michael Brooks', 'michael@example.com', 'password123', '123 Pine St', false, false, CURRENT_TIMESTAMP),
+    ('Evelyn Kelly', 'evelyn@example.com', 'password456', '456 Cedar St', false, false, CURRENT_TIMESTAMP),
+    ('Alexander Price', 'alexander@example.com', 'password789', '789 Oak St', false, false, CURRENT_TIMESTAMP),
+    ('Layla Hayes', 'layla@example.com', 'passwordabc', '123 Maple St', false, false, CURRENT_TIMESTAMP),
+    ('Daniel Russell', 'daniel@example.com', 'passworddef', '456 Elm St', false, false, CURRENT_TIMESTAMP);
+
+
+-- Query without index
+EXPLAIN ANALYZE SELECT * FROM users WHERE address = '123 Main St';
+
+-- Create an index on the email column
+CREATE INDEX idx_users_address ON users (address);
+
+SELECT 
+  indexname, 
+  indexdef 
+FROM 
+  pg_indexes 
+WHERE 
+  tablename = 'users';
+
+
+-- Query with index
+EXPLAIN ANALYZE SELECT * FROM Users WHERE address = '123 Main St';
+
+```
+
+### When Should Indexes be Avoided? (collected from tutorialspoint)
+
+Although indexes are intended to enhance a database's performance, there are times when they should be avoided. The following guidelines indicate when the use of an index should be reconsidered −
+
+- Indexes should not be used on small tables.
+
+- Tables that have frequent, large batch update or insert operations.
+
+- Indexes should not be used on columns that contain a high number of NULL values.
+
+- Columns that are frequently manipulated should not be indexed.
+
+## 34. How to Use pgAdmin
 
 - you need to have access to psql dbms so make sure to have it already
 - download and install pgAdmin
@@ -1299,7 +1557,7 @@ FROM TableName;
 - SAVE FILE
 - BROWSE OBJECT
 
-## 34. PostgreSQL REST API
+## 35. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
 - it supports sql and json
