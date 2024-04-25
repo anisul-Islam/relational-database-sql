@@ -1620,3 +1620,492 @@ WHERE condition;
 - create server
 - create a database
 - create a table
+
+## 36. C# .NET Backend REST API
+
+- Create ASP.NET Core Apps
+- Understand REST APIs
+- Implement CRUD Endpoints
+- Data Transfer Objects (DTOs)
+- Extension Methods
+- Route Groups
+- Handle Invalid Inputs
+- Entity Framework Core
+- Asynchornous Programming
+
+### create first web api and folder structure
+
+- what is API? why do we need API?
+- HTTP Verbs + CRUD Operations
+- HTTP Status Code
+
+- `dotnet new list`
+- As a beginner start with this command: `dotnet new web -o ecommerce-api`
+- command `dotnet new webapi -o ecommerce-api`
+- cmd+shift+p -> .NET: New Project + Enter
+- check Program.cs
+
+```cs
+var builder = WebApplication.CreateBuilder(args);
+// WebApplication is basically just host for http server where you can make http requets
+var app = builder.Build();
+
+app.MapGet("/", () => "Hello World!");
+
+app.Run();
+```
+
+- check .csproj file -> where we will add all dependencies mostly
+
+- appsettings.json vs appsettings.Development.json -> mainly for configuration
+
+- launchSettings.json - profiles configuration for only local development not for production development
+
+- obj file is the intermediate
+- bin is the executeable
+- how to build the project: go to root directory: dotnet buiild (ctrl+shift+B)
+- how to run the app (F5) + install Jsonnet Language Server + select c# + http/default or go to solution explorer -> debug -> start without debugging
+- how to run with terminal. go to root directory -> `dotnet run`
+- auto sever restart `dotnet watch run`
+
+### API, REST API
+
+REST (Representational State Transfer) is an architectural style for designing networked applications. It relies on a stateless, client-server communication model and emphasizes the use of standard HTTP methods and status codes. REST APIs adhere to a set of constraints that define their architectural properties. These constraints, defined by Roy Fielding in his doctoral dissertation, help ensure that RESTful APIs are scalable, reliable, and maintainable. Let's explore these constraints with examples:
+
+1. **Client-Server Architecture**:
+   - Constraint: Separation of concerns between client and server.
+   - Example: A web application (client) communicates with a server through HTTP requests. The client is responsible for presenting data to the user, while the server is responsible for processing requests and managing resources.
+
+2. **Statelessness**:
+   - Constraint: Each request from a client must contain all the information necessary for the server to fulfill the request. The server does not store any client state between requests.
+   - Example: In a RESTful API, authentication tokens are sent with each request to authenticate the client. The server does not maintain session state for individual clients.
+
+3. **Cacheability**:
+   - Constraint: Responses from the server must explicitly indicate whether they can be cached by clients or not.
+   - Example: The server includes cache-control headers in its HTTP responses to specify caching behavior. Clients can cache responses for a certain period to reduce the need for repeated requests.
+
+4. **Uniform Interface**:
+   - Constraint: The interface between client and server must be uniform, simplifying the architecture and promoting scalability.
+   - Example:
+     - Resource Identification: Each resource in the API is identified by a unique URI (Uniform Resource Identifier).
+     - Resource Manipulation: Clients interact with resources through standard HTTP methods like GET, POST, PUT, DELETE.
+     - Self-Descriptive Messages: Responses include metadata (e.g., content type, cache directives) to describe how to process the payload.
+     - Hypermedia as the Engine of Application State (HATEOAS): Responses contain hyperlinks that allow clients to navigate the API dynamically.
+
+5. **Layered System**:
+   - Constraint: The architecture must support a hierarchical layered system, allowing intermediaries (e.g., proxies, gateways) to be inserted between clients and servers without affecting the overall behavior.
+   - Example: A client sends a request to a load balancer, which forwards the request to one of several identical server instances. The load balancer acts as an intermediary, distributing incoming requests among the servers.
+
+6. **Code on Demand (Optional)**:
+   - Constraint: Servers can provide executable code (e.g., JavaScript) to clients for extended functionality, but it is optional.
+   - Example: A web server may send client-side scripts (e.g., JavaScript functions) to a web browser as part of an HTML response. The browser can execute these scripts to enhance user interactivity.
+
+These constraints ensure that RESTful APIs are scalable, reliable, and maintainable. By adhering to these principles, developers can design APIs that are easily understood, interoperable, and adaptable to changing requirements.
+
+#### Install REST CLIENT for http requests
+
+- create a ecommerce.http file `GET http://localhost:5277`
+
+#### URL? best practices when naming URL
+
+1. **URL:** `https://www.amazon.com/gp/product/B07H1DWFLG/ref=s9_acsd_hps_bw_c_x_3_w?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-4&pf_rd_r=EK5R9ET1VB7E0M6X23T3&pf_rd_t=101&pf_rd_p=5f6a5c92-95cb-486c-aa05-69e0e2efeb50&pf_rd_i=15240825011`
+   - **Scheme:** `https`
+   - **Authority:** `www.amazon.com`
+   - **Path:** `/gp/product/B07H1DWFLG/ref=s9_acsd_hps_bw_c_x_3_w`
+   - **Query Parameters:** `pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-4&pf_rd_r=EK5R9ET1VB7E0M6X23T3&pf_rd_t=101&pf_rd_p=5f6a5c92-95cb-486c-aa05-69e0e2efeb50&pf_rd_i=15240825011`
+   - **Fragment Identifier:** None
+
+2. **URL:** `https://www.example.com/blog/post?id=123#comments`
+   - **Scheme:** `https`
+   - **Authority:** `www.example.com`
+   - **Path:** `/blog/post`
+   - **Query Parameters:** `id=123`
+   - **Fragment Identifier:** `comments`
+
+Best Practices for URL Naming:
+
+1. **Use Descriptive Names:**
+   - **Good Example:** `/products` - Clearly indicates that this endpoint deals with products.
+   - **Bad Example:** `/data` - Vague and unclear.
+
+2. **Use Plural Nouns for Collections:**
+   - **Good Example:** `/users`, `/products` - Represents collections of resources.
+   - **Bad Example:** `/user`, `/product` - Singular form is less intuitive for collections.
+
+3. **Use Singular Nouns for Specific Resources:**
+   - **Good Example:** `/user/{userId}`, `/product/{productId}` - Represents individual instances of resources.
+   - **Bad Example:** `/users/{userId}`, `/products/{productId}` - Confusing plural form for specific resources.
+
+4. **Use Hyphens for Readability:**
+   - **Good Example:** `/product-categories`, `/order-items` - Improves readability.
+   - **Bad Example:** `/productcategories`, `/orderitems` - Less readable and harder to parse.
+
+5. **Avoid Hard-Coding IDs:**
+   - **Good Example:** `/users/{username}` - Uses a meaningful identifier instead of a database ID.
+   - **Bad Example:** `/users/{userId}` - Exposes internal implementation details.
+
+6. **Versioning:**
+   - **Good Example:** `/v1/products`, `/v2/products` - Includes version number for backward compatibility.
+   - **Bad Example:** `/products/v1`, `/products?version=1` - Less standardized and harder to manage.
+
+7. **Use Consistent Naming Conventions:**
+   - **Good Example:** `/customers`, `/orders`, `/payments` - Consistent use of nouns for resources.
+   - **Bad Example:** `/customer`, `/order`, `/pay` - Inconsistent naming convention.
+
+8. **Limit URL Depth:**
+   - **Good Example:** `/users/{userId}/orders` - Concise and avoids excessive nesting.
+   - **Bad Example:** `/users/{userId}/orders/{orderId}/items` - Excessive nesting increases complexity.
+
+9. **Avoid Verbs in URL Paths:**
+   - **Good Example:** `POST /products` - Uses HTTP methods for actions instead of verbs in URL.
+   - **Bad Example:** `/createProduct`, `/deleteOrder` - Verb usage makes URLs less RESTful.
+
+10. **Use Subresources for Relationships:**
+
+- **Good Example:** `/users/{userId}/orders`, `/products/{productId}/reviews` - Represents relationships between resources.
+- **Bad Example:** `/userOrders`, `/productReviews` - Less intuitive and violates REST principles.
+
+By following these best practices, API designers can create URL structures that are intuitive, consistent, and easy to understand, improving the developer experience and usability of the API.
+
+### DTO (Data Transfer Objects)
+
+- dto is just a reperesentation of the resource
+- some pople might name as contracts
+- create a folder called Dtos-> ProductDto.cs
+- we will create record cause they are immutable (non changeable after creating)
+
+```csharp
+  namespace EcommerceAPI;
+
+  public record class ProductDto
+  (int Id, string Name, double Price);
+```
+
+### GET /products and /products{id}
+
+- now inside Program.cs
+
+```csharp
+using EcommerceAPI;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+
+List<ProductDto> products = [
+
+    new ProductDto(1, "Iphone 13", 350.25),
+    new ProductDto(2, "Samsung", 325.25),
+    new ProductDto(3, "IPhone 14", 225.25)
+];
+
+app.MapGet("/products", () => products);
+
+app.MapGet("/products/{id}", (int id) =>
+{
+  var foundProduct = products.Find(product => product.Id == id);
+  return foundProduct is null ? Results.NotFound() : Results.Ok(foundProduct);
+}).WithName("GetProduct");
+```
+
+### how to create API response
+
+```csharp
+// first create the template of the response
+public record ApiResponse<T>(T Data, string Message);
+
+// now create the response
+var response = new ApiResponse<ProductDto>(foundProduct, "Product found successfully");
+
+// use the response
+ return foundProduct is null ? Results.NotFound() : Results.Ok(response);
+
+ // so finally
+  app.MapGet("/products/{id}", (int id) =>
+    {
+      var foundProduct = products.Find(product => product.Id == id);
+      if (foundProduct != null)
+      {
+        var response = new ApiResponse<ProductDto>(foundProduct, "Product found successfully");
+        return foundProduct is null ? Results.NotFound() : Results.Ok(response);
+      }
+      else
+      {
+        return Results.NotFound("Product not found");
+      }
+
+    }).WithName("GetProduct");
+```
+
+### POST /products
+
+- CreateProductDto.cs another record
+
+The CreateProductDto record in your example is a data transfer object (DTO) used for representing the data needed to create a new product. It has two properties:
+
+Name: Represents the name of the product.
+Price: Represents the price of the product.
+
+```csharp
+// Dtos/CreateProductDto
+namespace EcommerceAPI;
+
+public record class CreateProductDto
+(string Name, double Price);
+
+app.MapPost("/products", (CreateProductDto newProduct) =>
+{
+ ProductDto product = new(
+        products.Count + 1,
+        newProduct.Name,
+        newProduct.Price
+      );
+  products.Add(product);
+  // return products;
+  return Results.CreatedAtRoute("GetProduct", new { id = product.Id }, product);
+});
+```
+
+### PUT /products/{id}
+
+```csharp
+app.MapPut("/products/{id}", (int id, UpdateProductDto updateProduct) =>
+{
+  // find existing product 
+  var foundProductIndex = products.FindIndex(product => product.Id == id);
+  if (foundProductIndex == -1)
+  {
+    return Results.NotFound(); // create or not create if it is not found based on your own expectation
+  }
+  else
+  {
+    products[foundProductIndex] = new ProductDto(id, updateProduct.Name, updateProduct.Price);
+    return Results.NoContent();
+  }
+  // replace with update data
+});
+```
+
+### DELETE /products/{id}
+
+```csharp
+app.MapDelete("/products/{id}", (int id) =>
+{
+  products.RemoveAll(product => product.Id == id);
+  return Results.Ok();
+});
+
+```
+
+### Extension, combine all the endpoints
+
+- create an EndPoints folder and move codes
+
+```csharp
+// EndPoints/ProductEndPoits class
+namespace EcommerceAPI;
+
+public static class ProductEndpoints
+{
+  private static readonly List<ProductDto> products = [
+    new ProductDto(1, "Iphone 13", 350.25),
+    new ProductDto(2, "Samsung", 325.25),
+    new ProductDto(3, "IPhone 14", 225.25)
+  ];
+
+  public static WebApplication MapProductsEndPoints(this WebApplication app)
+  {
+
+    app.MapGet("/products", () => products);
+
+    app.MapGet("/products/{id}", (int id) =>
+    {
+      var foundProduct = products.Find(product => product.Id == id);
+      return foundProduct is null ? Results.NotFound() : Results.Ok(foundProduct);
+    }).WithName("GetProduct");
+
+    app.MapPost("/products", (CreateProductDto newProduct) =>
+    {
+      ProductDto product = new(
+        products.Count + 1,
+        newProduct.Name,
+        newProduct.Price
+      );
+      products.Add(product);
+      // return products;
+      return Results.CreatedAtRoute("GetProduct", new { id = product.Id }, product);
+    });
+
+    app.MapPut("/products/{id}", (int id, UpdateProductDto updateProduct) =>
+    {
+      // find existing product 
+      var foundProductIndex = products.FindIndex(product => product.Id == id);
+      if (foundProductIndex == -1)
+      {
+        return Results.NotFound(); // create or not create if it is not found based on your own expectation
+      }
+      else
+      {
+        products[foundProductIndex] = new ProductDto(id, updateProduct.Name, updateProduct.Price);
+        return Results.NoContent();
+      }
+      // replace with update data
+    });
+
+   app.MapDelete("/products/{id}", (int id) =>
+    {
+        var productToRemove = products.Find(p => p.Id == id);
+        if (productToRemove != null)
+        {
+            products.Remove(productToRemove);
+            return Results.Ok("Product deleted successfully");
+        }
+        else
+        {
+            return Results.NotFound("Product not found");
+        }
+    });
+
+
+    return app;
+
+  }
+
+}
+
+// now Program.cs
+using EcommerceAPI;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var app = builder.Build();
+
+app.MapProductsEndPoints();
+
+app.Run();
+
+```
+
+### grouping routes
+
+```csharp
+namespace EcommerceAPI;
+
+public record ApiResponse<T>(T Data, string Message);
+public static class ProductEndpoints
+{
+  private static readonly List<ProductDto> products = [
+    new ProductDto(1, "Iphone 13", 350.25),
+    new ProductDto(2, "Samsung", 325.25),
+    new ProductDto(3, "IPhone 14", 225.25)
+  ];
+
+  public static RouteGroupBuilder MapProductsEndPoints(this WebApplication app)
+  {
+
+    var group = app.MapGroup("products");
+
+    // GET -> /products
+    group.MapGet("/", () => products);
+
+    // GET -> /products/1
+    group.MapGet("/{id}", (int id) =>
+    {
+      var foundProduct = products.Find(product => product.Id == id);
+      if (foundProduct != null)
+      {
+        var response = new ApiResponse<ProductDto>(foundProduct, "Product found successfully");
+        return foundProduct is null ? Results.NotFound() : Results.Ok(response);
+      }
+      else
+      {
+        return Results.NotFound("Product not found");
+      }
+
+    }).WithName("GetProduct");
+
+    // POST -> /products
+    group.MapPost("/", (CreateProductDto newProduct) =>
+    {
+     ProductDto product = new(
+        products.Count + 1,
+        newProduct.Name,
+        newProduct.Price
+      );
+      products.Add(product);
+      // return products;
+      return Results.CreatedAtRoute("GetProduct", new { id = product.Id }, product);
+    });
+
+    group.MapPut("/{id}", (int id, UpdateProductDto updateProduct) =>
+    {
+      // find existing product 
+      var foundProductIndex = products.FindIndex(product => product.Id == id);
+      if (foundProductIndex == -1)
+      {
+        return Results.NotFound(); // create or not create if it is not found based on your own expectation
+      }
+      else
+      {
+        products[foundProductIndex] = new ProductDto(id, updateProduct.Name, updateProduct.Price);
+        return Results.NoContent();
+      }
+      // replace with update data
+    });
+
+    group.MapDelete("/{id}", (int id) =>
+    {
+      var productToRemove = products.Find(p => p.Id == id);
+      if (productToRemove != null)
+      {
+        products.Remove(productToRemove);
+        return Results.Ok("Product deleted successfully");
+      }
+      else
+      {
+        return Results.NotFound("Product not found");
+      }
+    });
+    return group;
+  }
+
+}
+```
+
+### Validation with Data Annotation / Handling Invalid Inputs
+
+- what happen if you do not pass product name and it creates the product? it should be a bad request 400
+- add the data annotation to the DTOs
+- add the nuget package (MinimalApis.Extensions) from the package manager (add the vsextension)
+
+```csharp
+using System.ComponentModel.DataAnnotations;
+
+namespace EcommerceAPI;
+
+public record class CreateProductDto
+(
+  [Required][StringLength(50)] string Name,
+  [Range(1, 1000)] double Price
+);
+
+using System.ComponentModel.DataAnnotations;
+
+namespace EcommerceAPI;
+
+public record class UpdateProductDto
+(
+  [Required][StringLength(50)] string Name,
+  [Range(1, 1000)] double Price
+);
+
+```
+
+### CRUD operations in React Now
+
+```csharp
+
+```
+
+### ORM (Object Related Modapping)
