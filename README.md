@@ -1812,7 +1812,7 @@ app.MapGet("/products/{id}", (int id) =>
 ### how to create API response
 
 ```csharp
-// first create the template of the response
+// first create the template of the response outside the class
 public record ApiResponse<T>(T Data, string Message);
 
 // now create the response
@@ -2108,4 +2108,1078 @@ public record class UpdateProductDto
 
 ```
 
-### ORM (Object Related Modapping)
+### .NET Framework - Entity Framework core
+
+Entity Framework Core (EF Core) is an object-relational mapping (ORM) framework developed by Microsoft for .NET applications. It provides a set of tools and libraries for developers to interact with relational databases using .NET objects.
+
+ORM, or Object-Relational Mapping, is a programming technique that enables developers to work with relational databases using object-oriented programming languages like C#. ORM frameworks like Entity Framework Core allow developers to map database tables to .NET classes and properties, making it easier to query and manipulate data in the database without having to write SQL queries directly.
+
+- REST API (C# Objects) - Entity Framrwork CORE - DB (Table)
+
+- defining the data Model
+
+```csharp
+// create the Categories Table
+namespace EcommerceAPI;
+
+public class Categories
+{
+  public int Id { get; set; }
+  public required string Name { get; set; }
+  public required string Description { get; set; }
+
+}
+
+// create the Product Table
+namespace EcommerceAPI;
+
+public class Products
+{
+  public int Id { get; set; }
+  // public string? Name { get; set; } (can have null)
+
+  // public string? Name { get; set; } = string.Empty; (empty string)
+
+  public required string Name { get; set; }
+  public int Price { get; set; }
+
+  public int CategoryId { get; set; }
+  public Categories? Category { get; set; } // populate the Category for the product
+
+}
+```
+
+- add a package for entity framework
+  - `Npgsql.EntityFrameworkCore.PostgreSQL`
+  - `dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL --version 9.0.0-preview.3`
+
+## 37. C# .NET REST API
+
+### basic setup
+
+- create, build and run a web api
+
+  ```csharp
+    dotnet new webapi -o api
+    dotnet build
+    dotnet run
+    dotnet watch run
+  ```
+
+  ```csharp
+  // clean the code
+  var builder = WebApplication.CreateBuilder(args);
+
+  // Add services to the container.
+  // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+  builder.Services.AddEndpointsApiExplorer();
+  builder.Services.AddSwaggerGen();
+
+  var app = builder.Build();
+
+  // Configure the HTTP request pipeline.
+  if (app.Environment.IsDevelopment())
+  {
+      app.UseSwagger();
+      app.UseSwaggerUI();
+  }
+
+  app.UseHttpsRedirection();
+
+
+  app.Run();
+  ```
+
+- Swagger API Doc -> `http://localhost:5097/swagger/index.html`
+
+- add few routes `/api/users`
+
+- Model (Explain MVC)
+
+  ```csharp
+  public class User
+  {
+    public Guid UserId { get; set; }
+    public required string Name { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public string Address { get; set; } = string.Empty;
+    public string Image { get; set; } = string.Empty;
+    public bool IsAdmin { get; set; }
+    public bool IsBanned { get; set; }
+    public DateTime CreatedAt { get; set; }
+  }
+  ```
+
+- Controllers & Services (Explain MVC)
+
+  ```csharp
+  // Controllers/UserController.cs
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+  using System.Threading.Tasks;
+  using Microsoft.AspNetCore.Mvc;
+
+  namespace api.Controllers
+  {
+      [ApiController]
+      [Route("/api/users")]
+      public class UserController : ControllerBase
+      {
+          private readonly UserService _userService;
+          public UserController()
+          {
+              _userService = new UserService();
+          }
+
+          [HttpGet]
+          public IActionResult GetAllUsers()
+          {
+              var users = _userService.GetAllUsersService();
+              return Ok(users);
+          }
+
+          [HttpGet("{userId}")]
+          public IActionResult GetUser(string userId)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+              var user = _userService.GetUserById(userIdGuid);
+              if (user == null)
+              {
+                  return NotFound();
+              }
+              else
+              {
+                  return Ok(user);
+              }
+
+          }
+
+          [HttpPost]
+          public IActionResult CreateUser(User newUser)
+          {
+              var createdUser = _userService.CreateUserService(newUser);
+              return CreatedAtAction(nameof(GetUser), new { userId = createdUser.UserId }, createdUser);
+          }
+
+
+          [HttpPut("{userId}")]
+          public IActionResult UpdateUser(string userId, User updateUser)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+              var user = _userService.UpdateUserService(userIdGuid, updateUser);
+              if (user == null)
+              {
+                  return NotFound();
+              }
+              return Ok(user);
+          }
+
+
+          [HttpDelete("{userId}")]
+          public IActionResult DeleteUser(string userId)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+              var result = _userService.DeleteUserService(userIdGuid);
+              if (!result)
+              {
+                  return NotFound();
+              }
+              return NoContent();
+          }
+
+      }
+  }
+
+  // Services/UserService.cs
+  public class UserService
+  {
+    // users api 
+    public static List<User> _users = new List<User>() {
+      new User{
+          UserId = Guid.Parse("75424b9b-cbd4-49b9-901b-056dd1c6a020"),
+          Name = "John Doe",
+          Email = "john@example.com",
+          Password = "password123",
+          Address = "123 Main St",
+          IsAdmin = false,
+          IsBanned = false,
+          CreatedAt = DateTime.Now
+      },
+      new User{
+          UserId = Guid.Parse("24508f7e-94ec-4f0b-b8d6-e8e16a9a3b29"),
+          Name = "Alice Smith",
+          Email = "alice@example.com",
+          Password = "password456",
+          Address = "456 Elm St",
+          IsAdmin = false,
+          IsBanned = false,
+          CreatedAt = DateTime.Now
+      },
+      new User{
+          UserId = Guid.Parse("87e5c4f3-d3e5-4e16-88b5-809b2b08b773"),
+          Name = "Bob Johnson",
+          Email = "bob@example.com",
+          Password = "password789",
+          Address = "789 Oak St",
+          IsAdmin = false,
+          IsBanned = false,
+          CreatedAt = DateTime.Now
+      }
+  };
+
+    public IEnumerable<User> GetAllUsersService()
+    {
+      return _users;
+    }
+    public User? GetUserById(Guid userId)
+    {
+      return _users.Find(user => user.UserId == userId);
+    }
+    public User CreateUserService(User newUser)
+    {
+      newUser.UserId = Guid.NewGuid();
+      newUser.CreatedAt = DateTime.Now;
+      _users.Add(newUser); // store this user in our database
+      return newUser;
+    }
+    public User UpdateUserService(Guid userId, User updateUser)
+    {
+      var existingUser = _users.FirstOrDefault(u => u.UserId == userId);
+      if (existingUser != null)
+      {
+        existingUser.Name = updateUser.Name;
+        existingUser.Email = updateUser.Email;
+        existingUser.Password = updateUser.Password;
+        existingUser.Address = updateUser.Address;
+        existingUser.Image = updateUser.Image;
+        existingUser.IsAdmin = updateUser.IsAdmin;
+        existingUser.IsBanned = updateUser.IsBanned;
+      }
+      return existingUser;
+    }
+    public bool DeleteUserService(Guid userId)
+    {
+      var userToRemove = _users.FirstOrDefault(u => u.UserId == userId);
+      if (userToRemove != null)
+      {
+        _users.Remove(userToRemove);
+        return true;
+      }
+      return false;
+    }
+
+  }
+  ```
+
+- add few packages and Update Program.cs file for using MVC
+
+  ```csharp
+  // dotnet add package Microsoft.AspNetCore.OData --version 8.0.0-preview3
+  // dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson --version 6.0.0-preview.6.21355.2
+  // dotnet add package Swashbuckle.AspNetCore --version 6.2.3
+
+  var builder = WebApplication.CreateBuilder(args);
+
+  builder.Services.AddEndpointsApiExplorer();
+  builder.Services.AddSwaggerGen();
+  builder.Services.AddControllers();
+
+  var app = builder.Build();
+
+  // Configure the HTTP request pipeline.
+  if (app.Environment.IsDevelopment())
+  {
+      app.UseSwagger();
+      app.UseSwaggerUI();
+  }
+
+  app.UseHttpsRedirection();
+  app.MapControllers();
+  app.Run();
+
+  ```
+
+- [Validation with Data Annotation](https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions-1/models-data/validation-with-the-data-annotation-validators-cs)
+
+  - add validation with data annotation
+
+  ```csharp
+    using System.ComponentModel.DataAnnotations;
+
+    public class User
+    {
+      public Guid UserId { get; set; }
+      [StringLength(50)]public required string Name { get; set; }
+
+      [Required(ErrorMessage = "Email is required")]
+      [EmailAddress(ErrorMessage = "Invalid email address")]
+      public required string Email { get; set; }
+
+      [Required(ErrorMessage = "Password is required")]
+      [MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+      public required string Password { get; set; }
+      public string Address { get; set; } = string.Empty;
+      public string Image { get; set; } = string.Empty;
+      public bool IsAdmin { get; set; }
+      public bool IsBanned { get; set; }
+      public DateTime CreatedAt { get; set; }
+
+      // [Range(1,100, ErrorMessage = "price has to be between 1 to 1000")]
+  }
+  ```
+
+  - add MinimalApis.Extenstion by using nuget gallery extension in vscode
+
+    ```csharp
+    // to all the endpoints in Program.cs
+
+    // app.MapControllers().WithParameterValidation();
+
+    // to individual endpoints in Program.cs file
+    // app.MapGet("/api/users", () => new UserController().GetAllUsers()).WithParameterValidation();
+    // app.MapGet("/api/users/{userId}", (Guid userId) => new UserController().GetUser(userId)).WithParameterValidation();
+    // app.MapPost("/api/users", (User newUser) => new UserController().CreateUser(newUser)).WithParameterValidation();
+    // app.MapPut("/api/users/{userId}", (Guid userId, User updateUser) => new UserController().UpdateUser(userId, updateUser)).WithParameterValidation();
+    // app.MapDelete("/api/users/{userId}", (Guid userId) => new UserController().DeleteUser(userId)).WithParameterValidation();
+    ```
+
+- Update the User
+
+  ```csharp
+     public Task<User?> UpdateUserService(Guid userId, User updateUser)
+      {
+        var existingUser = _users.FirstOrDefault(u => u.UserId == userId);
+        if (existingUser != null)
+        {
+          existingUser.Name = updateUser.Name ?? existingUser.Name;
+          existingUser.Email = updateUser.Email ?? existingUser.Email;
+          existingUser.Password = updateUser.Password ?? existingUser.Password;
+          existingUser.Address = updateUser.Address ?? existingUser.Address;
+          existingUser.Image = updateUser.Image ?? existingUser.Image;
+          // Check if IsAdmin is provided in updateUser, otherwise keep the existing value
+          if (updateUser.IsAdmin != default)
+          {
+            existingUser.IsAdmin = updateUser.IsAdmin;
+          }
+
+          // Check if IsBanned is provided in updateUser, otherwise keep the existing value
+          if (updateUser.IsBanned != default)
+          {
+            existingUser.IsBanned = updateUser.IsBanned;
+          }
+        }
+
+        return Task.FromResult(existingUser);
+      }
+
+  ```
+
+- Add asynchronous programming
+
+  ```csharp
+    using System;
+
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Mvc;
+
+    namespace api.Controllers
+    {
+        [ApiController]
+        [Route("/api/users")]
+        public class UserController : ControllerBase
+        {
+            private readonly UserService _userService;
+            public UserController()
+            {
+                _userService = new UserService();
+            }
+
+            [HttpGet]
+            public async Task<IActionResult> GetAllUsers()
+            {
+                var users = await _userService.GetAllUsersService();
+                return Ok(users);
+            }
+
+            [HttpGet("{userId}")]
+            public async Task<IActionResult> GetUser(string userId)
+            {
+                if (!Guid.TryParse(userId, out Guid userIdGuid))
+                {
+                    return BadRequest("Invalid user ID Format");
+                }
+                var user = await _userService.GetUserById(userIdGuid);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(user);
+                }
+            }
+
+            [HttpPost]
+            public async Task<IActionResult> CreateUser(User newUser)
+            {
+                var createdUser = await _userService.CreateUserService(newUser);
+                return CreatedAtAction(nameof(GetUser), new { userId = createdUser.UserId }, createdUser);
+            }
+
+            [HttpPut("{userId}")]
+            public async Task<IActionResult> UpdateUser(string userId, User updateUser)
+            {
+                if (!Guid.TryParse(userId, out Guid userIdGuid))
+                {
+                    return BadRequest("Invalid user ID Format");
+                }
+                var user = await _userService.UpdateUserService(userIdGuid, updateUser);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
+            }
+
+            [HttpDelete("{userId}")]
+            public async Task<IActionResult> DeleteUser(string userId)
+            {
+                if (!Guid.TryParse(userId, out Guid userIdGuid))
+                {
+                    return BadRequest("Invalid user ID Format");
+                }
+                var result = await _userService.DeleteUserService(userIdGuid);
+                if (!result)
+                {
+                    return NotFound();
+                }
+                return NoContent();
+            }
+        }
+    }
+  ```
+
+- handling exceptions
+
+  ```csharp
+     public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersService();
+                if (users == null || !users.Any())
+                {
+                    return NoContent(); // Return 204 No Content if there are no users
+                }
+                return Ok(new { message = "Users retrieved successfully", data = users });
+            }
+            catch (Exception ex)
+            {
+
+                // Log the exception for debugging and monitoring purposes
+                Console.WriteLine($"An error occurred while retrieving users: {ex.Message}");
+
+                // Return a server error response with a meaningful error message
+                return StatusCode(500, "An error occurred while processing your request. Please try again later.");
+            }
+        }
+  ```
+
+- customizing the success and error response
+
+  ```csharp
+  //Helpers/ErrorResponse.cs
+  public class ErrorResponse
+
+  {
+    public bool Success { get; set; } = false;
+    public string? Message { get; set; }
+  }
+
+
+  //Helpers/SuccessResponse.cs
+  public class SuccessResponse<T>
+
+  {
+      public bool Success { get; set; } = true;
+      public string? Message { get; set; }
+      public T? Data { get; set; }
+  }
+
+  ```
+
+- update the UserController now
+
+  ```csharp
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+  using System.Threading.Tasks;
+  using Microsoft.AspNetCore.Mvc;
+
+  namespace api.Controllers
+  {
+      [ApiController]
+      [Route("/api/users")]
+      public class UserController : ControllerBase
+      {
+          private readonly UserService _userService;
+
+          public UserController()
+          {
+              _userService = new UserService();
+          }
+
+          [HttpGet]
+          public async Task<IActionResult> GetAllUsers()
+          {
+              try
+              {
+                  var users = await _userService.GetAllUsersService();
+                  if (users == null || !users.Any())
+                  {
+                      return NoContent(); // Return 204 No Content if there are no users
+                  }
+                  return Ok(new SuccessResponse<IEnumerable<User>>
+                  {
+                      Success = true,
+                      Message = "Users retrieved successfully",
+                      Data = users
+                  });
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception for debugging and monitoring purposes
+                  Console.WriteLine($"An error occurred while retrieving users: {ex.Message}");
+
+                  // Return a server error response with a meaningful error message
+                  return StatusCode(500, new ErrorResponse
+                  {
+                      Success = false,
+                      Message = "An error occurred while processing your request. Please try again later."
+                  });
+              }
+          }
+
+          [HttpGet("{userId}")]
+          public async Task<IActionResult> GetUser(string userId)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+
+              try
+              {
+                  var user = await _userService.GetUserById(userIdGuid);
+                  if (user == null)
+                  {
+                      return NotFound(new ErrorResponse
+                      {
+                          Success = false,
+                          Message = "User not found"
+                      });
+                  }
+                  else
+                  {
+                      return Ok(new SuccessResponse<User>
+                      {
+                          Success = true,
+                          Message = "User retrieved successfully",
+                          Data = user
+                      });
+                  }
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception for debugging and monitoring purposes
+                  Console.WriteLine($"An error occurred while retrieving user: {ex.Message}");
+
+                  // Return a server error response with a meaningful error message
+                  return StatusCode(500, new ErrorResponse
+                  {
+                      Success = false,
+                      Message = "An error occurred while processing your request. Please try again later."
+                  });
+              }
+          }
+
+          [HttpPost]
+          public async Task<IActionResult> CreateUser(User newUser)
+          {
+              try
+              {
+                  var createdUser = await _userService.CreateUserService(newUser);
+                  return CreatedAtAction(nameof(GetUser), new { userId = createdUser.UserId }, new SuccessResponse<User>
+                  {
+                      Success = true,
+                      Message = "User created successfully",
+                      Data = createdUser
+                  });
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception for debugging and monitoring purposes
+                  Console.WriteLine($"An error occurred while creating user: {ex.Message}");
+
+                  // Return a server error response with a meaningful error message
+                  return StatusCode(500, new ErrorResponse
+                  {
+                      Success = false,
+                      Message = "An error occurred while processing your request. Please try again later."
+                  });
+              }
+          }
+
+          [HttpPut("{userId}")]
+          public async Task<IActionResult> UpdateUser(string userId, User updateUser)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+
+              try
+              {
+                  var user = await _userService.UpdateUserService(userIdGuid, updateUser);
+                  if (user == null)
+                  {
+                      return NotFound(new ErrorResponse
+                      {
+                          Success = false,
+                          Message = "User not found"
+                      });
+                  }
+                  else
+                  {
+                      return Ok(new SuccessResponse<User>
+                      {
+                          Success = true,
+                          Message = "User updated successfully",
+                          Data = user
+                      });
+                  }
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception for debugging and monitoring purposes
+                  Console.WriteLine($"An error occurred while updating user: {ex.Message}");
+
+                  // Return a server error response with a meaningful error message
+                  return StatusCode(500, new ErrorResponse
+                  {
+                      Success = false,
+                      Message = "An error occurred while processing your request. Please try again later."
+                  });
+              }
+          }
+
+          [HttpDelete("{userId}")]
+          public async Task<IActionResult> DeleteUser(string userId)
+          {
+              if (!Guid.TryParse(userId, out Guid userIdGuid))
+              {
+                  return BadRequest("Invalid user ID Format");
+              }
+
+              try
+              {
+                  var result = await _userService.DeleteUserService(userIdGuid);
+                  if (!result)
+                  {
+                      return NotFound(new ErrorResponse
+                      {
+                          Success = false,
+                          Message = "User not found"
+                      });
+                  }
+                  else
+                  {
+                      return NoContent(); // Return 204 No Content if user deleted successfully
+                  }
+              }
+              catch (Exception ex)
+              {
+                  // Log the exception for debugging and monitoring purposes
+                  Console.WriteLine($"An error occurred while deleting user: {ex.Message}");
+
+                  // Return a server error response with a meaningful error message
+                  return StatusCode(500, new ErrorResponse
+                  {
+                      Success = false,
+                      Message = "An error occurred while processing your request. Please try again later."
+                  });
+              }
+          }
+      }
+  }
+  
+  ```
+
+### Category API
+
+- Add Slug to CategoryModel
+
+```csharp
+public class Category
+{
+  public Guid CategoryId { get; set; }
+
+  [Required(ErrorMessage = "Category Name is required")]
+  [MaxLength(32, ErrorMessage = "Category Name must be less than 32 characters")]
+  public required string Name { get; set; }
+  public string Slug { get; set; } = string.Empty;
+
+  [MaxLength(255, ErrorMessage = "Category Description must be less than 255 characters")]
+  public string Description { get; set; } = string.Empty;
+  public DateTime CreatedAt { get; set; }
+}
+```
+
+- Add slug to the exisiting categories and when creating the Category in CategoryService.cs
+
+```csharp
+  private string GenerateSlug(string name)
+    {
+        // Convert the category name to lowercase and replace spaces with dashes
+        return name.ToLower().Replace(" ", "-");
+    }
+  
+   public Category CreateCategoryService(Category newCategory)
+    {
+        newCategory.CategoryId = Guid.NewGuid();
+        newCategory.CreatedAt = DateTime.Now;
+        newCategory.Slug = GenerateSlug(newCategory.Name);
+        _categories.Add(newCategory); // store this user in our database
+        return newCategory;
+    }
+```
+
+- Update the CategoryController with exception handling
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+
+namespace api.Controllers
+{
+    [ApiController]
+    [Route("/api/categories")]
+    public class CategoryController : ControllerBase
+    {
+        private readonly CategoryService _categoryService;
+        public CategoryController()
+        {
+            _categoryService = new CategoryService();
+        }
+
+        [HttpGet]
+        public IActionResult GetAllCategories()
+        {
+            try
+            {
+                var categories = _categoryService.GetAllCategoryService();
+                if (categories == null || !categories.Any())
+                {
+                    return NoContent(); // Return 204 No Content if there are no categories
+                }
+                return Ok(new SuccessResponse<IEnumerable<Category>>
+                {
+                    Success = true,
+                    Message = "Categories retrieved successfully",
+                    Data = categories
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging and monitoring purposes
+                Console.WriteLine($"An error occurred while retrieving categories: {ex.Message}");
+
+                // Return a server error response with a meaningful error message
+                return StatusCode(500, new ErrorResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while processing your request. Please try again later."
+                });
+            }
+        }
+
+        [HttpGet("{categoryId}")]
+        public IActionResult GetCategory(string categoryId)
+        {
+            if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Success = false,
+                    Message = "Invalid category ID Format"
+                });
+            }
+
+            var category = _categoryService.GetCategoryById(categoryIdGuid);
+            if (category == null)
+            {
+                return NotFound(new ErrorResponse
+                {
+                    Success = false,
+                    Message = "Category not found"
+                });
+            }
+            else
+            {
+                return Ok(new SuccessResponse<Category>
+                {
+                    Success = true,
+                    Message = "Category retrieved successfully",
+                    Data = category
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CreateCategory(Category newCategory)
+        {
+            try
+            {
+                var createdCategory = _categoryService.CreateCategoryService(newCategory);
+                return CreatedAtAction(nameof(GetCategory), new { categoryId = createdCategory.CategoryId }, new SuccessResponse<Category>
+                {
+                    Success = true,
+                    Message = "Category created successfully",
+                    Data = createdCategory
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging and monitoring purposes
+                Console.WriteLine($"An error occurred while creating the category: {ex.Message}");
+
+                // Return a server error response with a meaningful error message
+                return StatusCode(500, new ErrorResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while processing your request. Please try again later."
+                });
+            }
+        }
+
+        [HttpPut("{categoryId}")]
+        public IActionResult UpdateCategory(string categoryId, Category updateCategory)
+        {
+            if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Success = false,
+                    Message = "Invalid category ID Format"
+                });
+            }
+
+            try
+            {
+                var category = _categoryService.UpdateCategoryService(categoryIdGuid, updateCategory);
+                if (category == null)
+                {
+                    return NotFound(new ErrorResponse
+                    {
+                        Success = false,
+                        Message = "Category not found"
+                    });
+                }
+                else
+                {
+                    return Ok(new SuccessResponse<Category>
+                    {
+                        Success = true,
+                        Message = "Category updated successfully",
+                        Data = category
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging and monitoring purposes
+                Console.WriteLine($"An error occurred while updating the category: {ex.Message}");
+
+                // Return a server error response with a meaningful error message
+                return StatusCode(500, new ErrorResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while processing your request. Please try again later."
+                });
+            }
+        }
+
+        [HttpDelete("{categoryId}")]
+        public IActionResult DeleteCategory(string categoryId)
+        {
+            if (!Guid.TryParse(categoryId, out Guid categoryIdGuid))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Success = false,
+                    Message = "Invalid category ID Format"
+                });
+            }
+
+            try
+            {
+                var result = _categoryService.DeleteCategoryService(categoryIdGuid);
+                if (!result)
+                {
+                    return NotFound(new ErrorResponse
+                    {
+                        Success = false,
+                        Message = "Category not found"
+                    });
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging and monitoring purposes
+                Console.WriteLine($"An error occurred while deleting the category: {ex.Message}");
+
+                // Return a server error response with a meaningful error message
+                return StatusCode(500, new ErrorResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while processing your request. Please try again later."
+                });
+            }
+        }
+    }
+}
+
+```
+
+- add rules to the endpoint
+
+  In ASP.NET Core routing, you can specify various constraints and rules for route parameters to ensure that they match specific patterns or conditions. Some commonly used rules include:
+
+  1. **Type Constraints**: As shown in `[HttpGet("{categoryId:guid}")]`, you can specify the type of the route parameter. In this case, `:guid` ensures that the `categoryId` route parameter must be a valid GUID.
+
+  2. **Length Constraints**: You can specify the length constraints for string route parameters using `{parameter:length(min,max)}`. For example, `{slug:length(1,100)}` ensures that the `slug` route parameter length must be between 1 and 100 characters.
+
+  3. **Regular Expression Constraints**: You can use regular expressions to specify more complex constraints for route parameters. For example, `{id:regex(\d{1,4})}` ensures that the `id` route parameter must be a string of 1 to 4 digits.
+
+  4. **Optional Parameters**: You can mark route parameters as optional by adding a `?` suffix. For example, `{id?}` indicates that the `id` route parameter is optional.
+
+  5. **Custom Constraints**: You can define custom constraint classes that implement `IRouteConstraint` interface and use them in routing. This allows you to define custom logic to determine if a route parameter is valid or not.
+
+  These are some common rules used for routing in ASP.NET Core. You can mix and match these rules as needed to define precise routing patterns for your application's endpoints.
+
+  To ensure that a route parameter consists of alphanumeric characters (0-9 and a-z) in ASP.NET Core routing, you can use a regular expression constraint. Here's how you can specify such a constraint:
+
+```csharp
+[HttpGet("{slug:regex(^[[0-9a-z]]+$)}")]
+public IActionResult GetCategoryBySlug(string slug)
+{
+    // Your action logic here
+}
+```
+
+In the above example:
+
+- `{slug:regex(^[[0-9a-z]]+$)}` specifies the route parameter `slug` with a regular expression constraint. The `^` and `$` symbols indicate the start and end of the string, respectively. `[0-9a-z]` specifies that the characters must be alphanumeric (0-9 and a-z).
+
+This constraint ensures that the `slug` route parameter consists only of alphanumeric characters (0-9 and a-z). If the parameter does not match this pattern, the route will not match, and the request will not be routed to this action method.
+
+- get category by slug
+
+```csharp
+  public Category GetCategoryBySlug(string slug)
+  {
+      // Assuming _categories is your list of categories
+      return _categories.FirstOrDefault(category => category.Slug == slug);
+  }
+
+```
+
+- how to receieve query parameter with FormQuery
+
+  ```csharp
+  // https://example.com/api/products?page=1&pageSize=10
+  using Microsoft.AspNetCore.Mvc;
+
+  using Microsoft.AspNetCore.Http;
+
+  namespace YourNamespace.Controllers
+  {
+      [ApiController]
+      [Route("api/[controller]")]
+      public class ProductController : ControllerBase
+      {
+          [HttpGet]
+          public IActionResult GetProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+          {
+              // Get the values of the query parameters
+              int pageNumber = page; // Default value is 1 if not specified
+              int itemsPerPage = pageSize; // Default value is 10 if not specified
+
+              // Use the page and pageSize values to implement pagination logic
+              // For example, you might use these values to retrieve products from a database
+
+              return Ok($"Retrieving products for page {pageNumber} with {itemsPerPage} items per page.");
+          }
+      }
+  }
+  
+  ```
+
+### Product API
+
+- ProductModel
+
+```csharp
+using System.ComponentModel.DataAnnotations;
+
+public class Product
+{
+  public Guid ProductId { get; set; }
+  public required string Name { get; set; }
+
+  [Required(ErrorMessage = "Price is required")]
+  [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number")]
+  public required decimal Price { get; set; }
+  public string Image { get; set; } = string.Empty;
+  public string Description { get; set; } = string.Empty;
+  public required int Quantity { get; set; }
+  public required int Sold { get; set; } = 0;
+  public required decimal Shipping { get; set; }
+
+  [Required(ErrorMessage = "CategoryId is required")]
+  public required Guid CategoryId { get; set; }
+  public Category? category { get; set; }
+
+  public DateTime CreatedAt { get; set; }
+}
+```
+
+- ProductController
+- ProductService
+
+### Order API
+
+- OrderModel
+- OrderController
+- OrderService
