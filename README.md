@@ -116,6 +116,8 @@
 - one-to-many (one record with another table's many records)
 - many-to-many (many records with another table's many records)
 
+![alt text](image.png)
+
 ## 6. Sorting vs Indexing
 
 - Indexing: Indexing in a database is a technique used to optimize the retrieval of data by creating data structures, called indexes, that allow for faster lookup of records. Indexes are similar to the index of a book, which helps you quickly locate information within the book.
