@@ -10,7 +10,11 @@
 - Data: unorganized & meaningless facts are known as data. example - anis, 101, 3.45, name, gpa, roll
 - Information: organized, process & meaningful facts are known as Information.
 
-- Database: Collection of related Data table or files. Example: college db can have student, teacher table etc.
+- Database: An organized collection of related Data table or files for accessign and manipulating Data. Example: college db can have student, teacher table etc.
+
+- Database Management System (DBMS) : Databases are managed by Database Management Systems (DBMS), which allow users to create, read, update, and delete data efficiently.
+
+- SQL: Structured Query Language for making and processing requests to Database.
 
 ### Advantages & Disadvantages of Database
 
@@ -19,19 +23,304 @@
 
 ## 2. Types of Database
 
-- Simple database vs Relational database
+- Relational database: Relational Databases (SQL): Store data in tables with predefined schemas. Ideal for transactions and data integrity. Examples: MySQL, PostgresSQL, Oracle. You need ACID (Atomicity, Consistency, Isolation, Durability) compliance to ensure reliable transactions, which is critical for applications where data integrity and consistency are paramount.
+Example: E-commerce transactions, banking, and financial systems.
+
+Usecase:
+E-commerce platforms (order processing, customer management).
+Financial applications (banking, trading systems).
+Content management systems (blog platforms, CMS).
+Enterprise resource planning (ERP) systems.
+
+- NoSQL Database: Schema less, Handle unstructured or semi-structured data, offering flexibility and scalability. Example: MongoDB, DynamoDB.
+Usecase:
+
+- Choosing Relational vs NoSQL
+
+Choose Relational Databases When:
+Data integrity and consistency are critical.
+You need complex queries and relationships.
+You require multi-step transactions.
+The schema is stable and not expected to change often.
+
+Choose NoSQL Databases When:
+You need high scalability and distributed data across servers.
+Data is unstructured, semi-structured, or rapidly evolving.
+Performance, speed, and low latency are top priorities.
+Your application handles big data or real-time analytics.
+
 - 3 important elements of RD: field=col, key-field, record=row, value
 - field vs record
 
-## 3. Types of Key
+## 3.1 Transaction and ACID Properties
+
+- A transaction in a database is a sequence of one or more operations performed as a single logical unit of work. These operations are executed together to accomplish a specific task, and they must adhere to the ACID principles (Atomicity, Consistency, Isolation, Durability) to ensure data integrity and reliability.
+
+![alt text](image-2.png)
+
+**ACID** is an acronym that stands for **Atomicity, Consistency, Isolation,** and **Durability**. These principles are crucial for maintaining the reliability, accuracy, and integrity of data in databases, especially in systems that handle multiple transactions.
+
+Let’s explore each ACID principle with an easy-to-understand example of a simple bank transfer scenario:
+
+### **Scenario: Bank Transfer Example**
+
+Imagine you are transferring $100 from your **Savings Account** to your **Checking Account** using an online banking system. This operation involves two main steps:
+
+1. **Deduct $100 from the Savings Account.**
+2. **Add $100 to the Checking Account.**
+
+To ensure that this transaction is handled correctly, the database needs to adhere to the ACID principles:
+
+### **1. Atomicity**
+
+**Definition:**  
+Atomicity ensures that all parts of a transaction are completed successfully or none of them are. If any part of the transaction fails, the entire transaction is rolled back, and the system returns to its previous state.
+
+![alt text](image-3.png)
+
+**Example:**
+
+- In our bank transfer example, both steps (deducting from the savings account and adding to the checking account) must either both happen or not happen at all.
+- **If Atomicity is maintained:** If the system crashes after deducting $100 from the savings account but before adding it to the checking account, the entire transaction will be rolled back, and no money will be deducted or added.
+- **Without Atomicity:** You could end up with $100 missing from your savings without it being added to your checking, leading to data inconsistency.
+
+### **2. Consistency**
+
+**Definition:**  
+Consistency ensures that a transaction takes the database from one valid state to another, adhering to all predefined rules and constraints.
+
+**Example:**
+
+- The rule here is that the total amount of money across both accounts must remain the same before and after the transaction.
+- Another rule: user account balance can not be negative.
+- Another rule: not allowing overdraw.
+- **If Consistency is maintained:** After the transfer, the combined balance of both accounts should still equal the original total amount (no money is created or lost).
+- **Without Consistency:** The accounts might show an incorrect balance, such as money disappearing or being duplicated, violating the bank’s rules.
+
+### **3. Isolation**
+
+**Definition:**  
+Isolation ensures that multiple transactions occurring at the same time do not affect each other’s execution. Each transaction should act as if it is the only one being processed.
+
+**Example:**
+
+- Imagine that while you’re transferring $100, someone else is also transferring money between accounts.
+- **If Isolation is maintained:** Your transfer of $100 will occur independently of the other transaction. Even if multiple transfers are happening simultaneously, each will be isolated, preventing any overlap or interference.
+- **Without Isolation:** If isolation is not maintained, you could encounter problems like one transaction overwriting the changes of another, resulting in incorrect balances.
+
+### **4. Durability**
+
+**Definition:**  
+Durability ensures that once a transaction is committed, it is permanently recorded in the database, even in the case of a power failure, crash, or other disasters.
+
+**Example:**
+
+- After your $100 transfer is completed, the changes are saved permanently.
+- **If Durability is maintained:** Even if there’s a sudden power outage right after your transaction completes, the transfer will not be lost; it’s saved securely in the database.
+- **Without Durability:** A completed transaction might be lost due to unforeseen system failures, leading to missing records or incomplete data.
+
+### **Putting It All Together:**
+
+When you initiate a transfer of $100 between your accounts, ACID principles ensure:
+
+- **Atomicity**: Both deduction and addition happen, or neither happens.
+- **Consistency**: The total money across accounts remains accurate.
+- **Isolation**: Other simultaneous transfers won’t interfere with your transaction.
+- **Durability**: Once completed, your transfer is saved permanently, even if there’s a system crash.
+
+### **Conclusion**
+
+ACID principles are critical for ensuring reliable and consistent database operations, especially in systems where transactions must be processed accurately and safely, such as financial systems, booking platforms, and inventory management. By adhering to ACID, databases protect data integrity and provide a reliable user experience, even in complex and high-stakes environments.
+
+## 3.2 Types of Key
 
 - Primary key: unique key. in a table you will have one primary key.
 - foreign key: one table's primary key - same other's table general key(foreign key). It is used to make relation between tables. In one table there can be multiple foreign keys.
 - composite key: when you need to use 2 or more keys to identify a record
 - Priamry key vs Foreign key
 
-## 4. DBMS & DBMS
+In a relational database, **keys** are crucial for organizing and managing data. They help ensure data integrity and establish relationships between different tables. In the context of an e-commerce database, different types of keys can be used to uniquely identify records, establish connections between tables, and enforce rules.
 
+### **Types of Keys in a Relational Database:**
+
+1. **Primary Key**
+2. **Foreign Key**
+3. **Composite Key**
+4. **Unique Key**
+5. **Candidate Key**
+6. **Alternate Key**
+
+Let's explore each type of key with examples relevant to an e-commerce database:
+
+### **1. Primary Key**
+
+**Definition:**  
+A **primary key** is a unique identifier for a record in a table. It ensures that each record in the table is unique and can be referenced unambiguously.
+
+**Example:**
+
+- **Table: Customers**
+  - `CustomerID` (Primary Key): Uniquely identifies each customer in the database.
+  
+- **Table: Products**
+  - `ProductID` (Primary Key): Uniquely identifies each product in the catalog.
+
+```sql
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    Name VARCHAR(255),
+    Email VARCHAR(255)
+);
+
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(255),
+    Price DECIMAL(10, 2)
+);
+```
+
+### **2. Foreign Key**
+
+**Definition:**  
+A **foreign key** is a field (or collection of fields) in one table that uniquely identifies a row in another table. It creates a relationship between the two tables, enforcing referential integrity.
+
+**Example:**
+
+- **Table: Orders**
+  - `OrderID` (Primary Key)
+  - `CustomerID` (Foreign Key referencing Customers table): Links each order to the corresponding customer.
+
+```sql
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    OrderDate DATE,
+    CustomerID INT,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+```
+
+### **3. Composite Key**
+
+**Definition:**  
+A **composite key** is a primary key that consists of two or more columns used together to uniquely identify a record in a table.
+
+**Example:**
+
+- **Table: OrderDetails**
+  - `OrderID` + `ProductID` (Composite Key): Together, these two fields uniquely identify each line item in an order.
+
+```sql
+CREATE TABLE OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    PRIMARY KEY (OrderID, ProductID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+```
+
+### **4. Unique Key**
+
+**Definition:**  
+A **unique key** ensures that all values in a column or a group of columns are unique across the entire table. Unlike primary keys, a table can have multiple unique keys, and they can accept a null value (but only one null if it's a single column unique key).
+
+**Example:**
+
+- **Table: Customers**
+  - `Email` (Unique Key): Ensures that no two customers can have the same email address.
+
+```sql
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    Name VARCHAR(255),
+    Email VARCHAR(255) UNIQUE
+);
+```
+
+### **5. Candidate Key**
+
+**Definition:**  
+A **candidate key** is a column, or a set of columns, that can uniquely identify any database record without referring to any other data. Every table can have one or more candidate keys, and out of these, one is selected as the primary key.
+
+**Example:**
+
+- **Table: Customers**
+  - Both `CustomerID` and `Email` could be candidate keys, but typically, one (e.g., `CustomerID`) is chosen as the primary key.
+
+### **6. Alternate Key**
+
+**Definition:**  
+An **alternate key** is any candidate key that is not chosen as the primary key. It is an alternative way of uniquely identifying rows in a table.
+
+**Example:**
+
+- **Table: Customers**
+  - If `CustomerID` is chosen as the primary key, `Email` could be an alternate key.
+
+### **Practical Example in an E-commerce Database:**
+
+```sql
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    Name VARCHAR(255),
+    Email VARCHAR(255) UNIQUE
+);
+
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(255),
+    Price DECIMAL(10, 2)
+);
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    OrderDate DATE,
+    CustomerID INT,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    PRIMARY KEY (OrderID, ProductID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+```
+
+### **Explanation:**
+
+- **Customers Table**:
+  - `CustomerID` is the primary key, ensuring each customer is unique.
+  - `Email` is a unique key, preventing duplicate emails.
+
+- **Products Table**:
+  - `ProductID` is the primary key, uniquely identifying each product.
+
+- **Orders Table**:
+  - `OrderID` is the primary key, and `CustomerID` is a foreign key, linking each order to a specific customer.
+
+- **OrderDetails Table**:
+  - The composite key (`OrderID`, `ProductID`) ensures that each combination of order and product is unique within the table.
+  - Foreign keys `OrderID` and `ProductID` link to the Orders and Products tables, respectively, establishing relationships.
+
+### **Summary:**
+
+In an e-commerce database:
+
+- **Primary keys** uniquely identify records.
+- **Foreign keys** create relationships between tables, ensuring referential integrity.
+- **Composite keys** can uniquely identify records based on multiple columns.
+- **Unique keys** ensure that specific columns, like emails, contain unique values.
+- **Candidate keys** are potential primary keys, and the one not chosen is an **alternate key**.
+
+Using these keys effectively helps maintain a well-organized, reliable, and scalable database structure for an e-commerce application.
+
+## 4. Database vs DBMS
+
+- App <=> DBMS <=> Database
 - DBMS - XAMPP (Cross platform Apache, MySQL, PHP Perl)
 - first download and install the DBMS - [PostgreSQL](https://www.postgresql.org/download/)
 - after downloading check the version: `psql -version`
@@ -110,13 +399,110 @@
     \password
     ```
 
-## 5. Database Relations
+## 5. ER Model
 
-- one-to-one (one record with another table's one record)
-- one-to-many (one record with another table's many records)
-- many-to-many (many records with another table's many records)
+### **What is an ER Model (Entity-Relationship Model)?**
 
-![alt text](image.png)
+The **Entity-Relationship (ER) Model** is a high-level data modeling technique used to visually represent the structure of a database. It helps in designing databases by depicting entities (objects) and the relationships between them. The ER Model provides a clear, graphical way to organize data, making it easier to understand how different data elements relate to each other within a system.
+
+### **Key Components of the ER Model:**
+
+1. **Entities**
+2. **Attributes**
+3. **Relationships**
+4. **Keys**
+5. **ER Diagram (ERD)**
+
+### **1. Entities**
+
+**Definition:**  
+An **entity** represents a real-world object or concept that is distinguishable from other objects. In the context of a database, entities are often modeled as tables.
+
+**Examples:**
+
+- **Customer**: Represents people who make purchases.
+- **Product**: Represents items available for sale.
+- **Order**: Represents transactions made by customers.
+
+### **2. Attributes**
+
+**Definition:**  
+**Attributes** are properties or characteristics of an entity. In a table, attributes are represented as columns.
+
+**Examples:**
+
+- **Customer Entity**: Attributes might include `CustomerID`, `Name`, `Email`.
+- **Product Entity**: Attributes might include `ProductID`, `ProductName`, `Price`.
+- **Order Entity**: Attributes might include `OrderID`, `OrderDate`, `CustomerID`.
+
+### **3. Relationships**
+
+**Definition:**  
+**Relationships** define how entities are connected to each other. They represent the logical association between entities.
+
+**Types of Relationships:**
+
+- **One-to-One (1:1)**: Each instance of an entity relates to exactly one instance of another entity.
+- **One-to-Many (1:N)**: One instance of an entity relates to multiple instances of another entity.
+- **Many-to-Many (M:N)**: Multiple instances of an entity relate to multiple instances of another entity.
+
+**Example Relationships:**
+
+- A **Customer** can place multiple **Orders** (One-to-Many).
+- An **Order** can include multiple **Products** (Many-to-Many).
+
+### **4. Keys**
+
+**Definition:**  
+**Keys** are attributes that uniquely identify entities and define relationships between entities.
+
+- **Primary Key**: Uniquely identifies each record within an entity.
+- **Foreign Key**: Establishes a link between two entities.
+
+### **5. ER Diagram (ERD)**
+
+**Definition:**  
+An **Entity-Relationship Diagram (ERD)** is a visual representation of the ER Model. It uses shapes like rectangles, ovals, and diamonds to represent entities, attributes, and relationships.
+
+**Components of an ER Diagram:**
+
+- **Rectangles** represent entities.
+- **Ovals** represent attributes.
+- **Diamonds** represent relationships.
+- **Lines** connect entities with their relationships and attributes.
+
+### **Example ER Diagram for an E-commerce System:**
+
+Let's look at a simple ER Diagram for an e-commerce system with three entities: **Customer**, **Order**, and **Product**.
+
+```plaintext
++----------------+         +----------------+         +----------------+
+|    Customer    |         |     Order      |         |    Product     |
++----------------+         +----------------+         +----------------+
+| CustomerID (PK)|         |  OrderID (PK)  |         | ProductID (PK) |
+| Name           |         |  OrderDate     |         | ProductName    |
+| Email          |         |  CustomerID (FK)|        | Price          |
++----------------+         +----------------+         +----------------+
+        |                         |                            |
+        |   (places)              |  (contains)                |
+        +-------------------------+----------------------------+
+```
+
+### **Explanation of the ER Diagram:**
+
+- **Entities**: `Customer`, `Order`, and `Product`.
+- **Attributes**: Each entity has attributes like `CustomerID`, `Name`, `Email` for Customer.
+- **Relationships**:
+  - **Customer to Order**: One-to-Many (`Customer` places multiple `Orders`).
+  - **Order to Product**: Many-to-Many (`Order` can contain multiple `Products`).
+
+### **Benefits of Using the ER Model:**
+
+1. **Clarity and Visualization**: ER Diagrams provide a clear and visual representation of data, making it easy for stakeholders to understand the database structure.
+2. **Design Blueprint**: Serves as a blueprint for designing and implementing a database.
+3. **Identifies Relationships**: Helps identify relationships and dependencies between different entities, improving data organization.
+4. **Improves Communication**: Enhances communication between database designers, developers, and business stakeholders by providing a common point of reference.
+5. **Ensures Data Integrity**: Clearly defined relationships and constraints help maintain data integrity and reduce redundancy.
 
 ## 6. Sorting vs Indexing
 
