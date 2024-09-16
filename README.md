@@ -1384,7 +1384,6 @@ Students will create a simple database for managing information about books and 
 
 ### **Submission Instructions:**
 
-- Provide screenshots of your SQL commands and their results in `psql`.
 - Submit a text file with the SQL queries you used for each step.
 
 ### **Further Exploration:**
