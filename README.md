@@ -11,8 +11,10 @@
 4. [Query and SQL](#4-query-and-sql)
 5. [DDL - CREATE, DROP, RENAME Database & TABLE](#5-ddl---create-drop-rename-database--table)
 6. [DML - INSERT RECORDS](#6-dml---insert-records)
-7. [DML - INSERT RECORDS](#6-dml---insert-records)
-8. [DML - INSERT RECORDS](#6-dml---insert-records)
+7. [DML - FIND / SELECT RECORDS](#7-dml---find--select-records)
+8. [DML - UPDATE STATEMENT](#8-dml---update-statement)
+9. [DML - UPDATE STATEMENT](#8-dml---update-statement)
+10. [Assignment for practcing CRUD](#10-assignment-for-practcing-crud)
 
 ## 1. introduction to Database
 
@@ -1197,7 +1199,7 @@ WHERE
 
   - To disable expanded display mode and return to the default display format, simply run: `\x`
 
-## SELECT and WHERE Clause
+### SELECT and WHERE Clause
 
 To perform select operations in PostgreSQL, you can use the `SELECT` statement. Here's an example of how you can retrieve data from the `Users` table:
 
@@ -1249,7 +1251,7 @@ FROM students
 WHERE city='Tampere';
 ```
 
-## DISTINCT, LIMIT, ORDER BY
+### DISTINCT, LIMIT, ORDER BY
 
 - distinct command for avoiding repeated values, limit can return limited records
 
@@ -1335,13 +1337,71 @@ DELETE FROM Users WHERE UserID = 1;
 DELETE FROM Orders WHERE UserID = 1;
 ```
 
-## 10. Operators
+## 10. Assignment for practcing CRUD
+
+### **Assignment: Basic CRUD Operations in PostgreSQL**
+
+This assignment is designed to help students practice basic SQL commands (Create, Read, Update, Delete) using PostgreSQL (`psql`). The goal is to familiarize students with fundamental database operations and query syntax.
+
+### **Objective:**
+
+Students will create a simple database for managing information about books and perform basic CRUD operations.
+
+### **Requirements:**
+
+1. Create a database called `library`.
+2. Create a table called `books` with the following structure:
+   - `book_id` (Primary Key, Auto-incremented)
+   - `title` (Text, Not Null)
+   - `author` (Text, Not Null)
+   - `published_year` (Integer)
+   - `genre` (Text)
+3. Perform the following CRUD operations:
+   - Insert new records into the `books` table.
+   - Read and display all records from the `books` table.
+   - Update an existing record.
+   - Delete a record.
+   - Sort the books by title in Descending order.
+
+```sql
+('To Kill a Mockingbird', 'Harper Lee', 1960, 'Fiction'),
+('1984', 'George Orwell', 1949, 'Dystopian'),
+('The Great Gatsby', 'F. Scott Fitzgerald', 1925, 'Classic'),
+('Pride and Prejudice', 'Jane Austen', 1813, 'Romance'),
+('Moby-Dick', 'Herman Melville', 1851, 'Adventure'),
+('War and Peace', 'Leo Tolstoy', 1869, 'Historical Fiction'),
+('The Catcher in the Rye', 'J.D. Salinger', 1951, 'Fiction'),
+('The Hobbit', 'J.R.R. Tolkien', 1937, 'Fantasy'),
+('Crime and Punishment', 'Fyodor Dostoevsky', 1866, 'Philosophical Fiction'),
+('Brave New World', 'Aldous Huxley', 1932, 'Science Fiction')
+```
+
+### **Assessment Criteria:**
+
+- Correctly creating the database and table structure.
+- Successfully executing insert, read, update, and delete queries.
+- Demonstrating an understanding of basic SQL commands and how they manipulate data within the database.
+
+### **Submission Instructions:**
+
+- Provide screenshots of your SQL commands and their results in `psql`.
+- Submit a text file with the SQL queries you used for each step.
+
+### **Further Exploration:**
+
+- Add constraints like `UNIQUE` and `NOT NULL` to the table.
+- Experiment with more complex queries, such as filtering results or joining with other tables (if created).
+- Implement additional columns such as `ISBN` and `price` and try updating them.
+
+This assignment will help students grasp basic database operations and understand the flow of data manipulation within a relational database system like PostgreSQL.
+
+## 11. Operators
 
 - Arithmetic operators: + - \* / %
 - Comparision or Relational operators > >= < <= = != BETWEEN
 - Logical operators: AND OR NOT IN
 
-## 11. RELATIONAL OPERTAORS IN SQL
+## 12. RELATIONAL OPERTAORS IN SQL
 
 - `SELECT * FROM Users WHERE CreatedAt > '2022-01-01';`
 
@@ -1358,7 +1418,7 @@ FROM students
 WHERE ID BETWEEN 101 AND 105;
 ```
 
-## 12. LOGICAL OPERTAORS IN SQL
+## 13. LOGICAL OPERTAORS IN SQL
 
 - OR, AND, NOT, IN, LIKE
 
@@ -1437,7 +1497,7 @@ SELECT * FROM Users WHERE CreatedAt BETWEEN '2022-01-01' AND '2022-12-31';
 
 These examples demonstrate various ways you can use the `WHERE` clause to filter records based on different conditions in your PostgreSQL queries.
 
-## 13. Custom name with AS Keyword
+## 14. Custom name with AS Keyword
 
 ```sql
 SELECT COL1 AS 'CUSTOM_NAME'
@@ -1455,7 +1515,7 @@ FROM students;
 
 `SELECT Email AS UserEmail FROM Users;`
 
-## 14. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+## 15. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
 
 - Sub Queries: Query inside query
 
@@ -1464,7 +1524,7 @@ SELECT * FROM Products
 WHERE Price > (SELECT AVG(Price) FROM Products);
 ```
 
-## 15. Constraint and AUTO_INCREMENT
+## 16. Constraint and AUTO_INCREMENT
 
 - When creating table we can set constraint and auto increment
 - Constraints: NOT NULL, UNIQUE, PRIMARY KEY = NOT NULL + UNIQUE, DEFAULT
@@ -1476,7 +1536,7 @@ CREATE TABLE TABLE_NAME N(
 )
 ```
 
-## 16. [Functions](https://youtu.be/hn6P4tBRaIE)
+## 17. [Functions](https://youtu.be/hn6P4tBRaIE)
 
 - Concatenating the username and email address:
 
@@ -1531,7 +1591,7 @@ In these queries:
 
 These queries will return the user(s) with the earliest and latest registration dates, respectively, from the `Users` table.
 
-## 17. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+## 18. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
 
 - aggregate: one result in the end. AVG(), COUNT(), MAX(), MIN(), SUM()
 
@@ -1562,7 +1622,7 @@ SELECT MIN(Price) AS LowestPrice FROM Products;
 
 ```
 
-## 18. GroupBy
+## 19. GroupBy
 
 ```sql
 SELECT Country, COUNT(UserID) AS UserCount
@@ -1570,7 +1630,7 @@ FROM Users
 GROUP BY Country;
 ```
 
-## 19. Joining Tables
+## 20. Joining Tables
 
 ```sql
 -- create student table 
@@ -1714,7 +1774,7 @@ INNER JOIN Products p ON o.ProductId = p.ProductId
 INNER JOIN Users u ON o.UserId = u.UserId;
 ```
 
-## 20. UNION and UNION ALL, INTERSECT
+## 21. UNION and UNION ALL, INTERSECT
 
 - create 2 tables: people_visited_england and people_visited_finland
 - same number of columns and same sequences
@@ -1775,7 +1835,7 @@ Explanation:
 
 This demonstrates how the `INTERSECT` operator can be used to find the intersection of two sets of data in SQL.
 
-## 21. VIEW (Virtual Table)
+## 22. VIEW (Virtual Table)
 
 - view is a virtual table a copy of original table with the columns that you want to display
 
@@ -1802,7 +1862,7 @@ WHERE Roll=101;
 - how to insert new records to the view
 - how to delete records from the view
 
-## 22. DATE & Time
+## 23. DATE & Time
 
 ```sql
 // for mysql
@@ -1830,7 +1890,7 @@ SELECT TO_CHAR(DOB, 'Day') AS day_of_week
 FROM TableName;
 ```
 
-## 23. [Indexing](https://www.postgresqltutorial.com/postgresql-indexes/postgresql-create-index/)
+## 24. [Indexing](https://www.postgresqltutorial.com/postgresql-indexes/postgresql-create-index/)
 
 Indexing is a database optimization technique used to improve the performance of queries by allowing the database engine to quickly locate rows in a table that match certain criteria. Here are some reasons why indexing is important:
 
@@ -1937,7 +1997,7 @@ Although indexes are intended to enhance a database's performance, there are tim
 
 - Columns that are frequently manipulated should not be indexed.
 
-## 24. How to Use pgAdmin
+## 25. How to Use pgAdmin
 
 - you need to have access to psql dbms so make sure to have it already
 - download and install pgAdmin
@@ -1947,7 +2007,7 @@ Although indexes are intended to enhance a database's performance, there are tim
 - SAVE FILE
 - BROWSE OBJECT
 
-## 25. PostgreSQL REST API
+## 26. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
 - it supports sql and json
@@ -2011,7 +2071,7 @@ WHERE condition;
 - create a database
 - create a table
 
-## 26. Sorting vs Indexing
+## 27. Sorting vs Indexing
 
 - Indexing: Indexing in a database is a technique used to optimize the retrieval of data by creating data structures, called indexes, that allow for faster lookup of records. Indexes are similar to the index of a book, which helps you quickly locate information within the book.
 
@@ -2037,6 +2097,6 @@ Here's how indexing works and its benefits:
 
 Indexing is a crucial aspect of database performance optimization. However, it's essential to strike a balance between the benefits of indexing and the overhead it imposes on data modification operations such as inserts, updates, and deletes. Over-indexing can lead to increased storage requirements and slower write operations, so it's essential to carefully consider the indexing strategy based on the specific requirements of your database application.
 
-## 27. Database security
+## 28. Database security
 
 - Encryption
