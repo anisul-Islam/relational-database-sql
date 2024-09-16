@@ -3,17 +3,27 @@
 - [My MySQL playlist](https://www.youtube.com/playlist?list=PLgH5QX0i9K3qLcx9DvVDWmNJ7riPvxzCD)
 - [PSQL Tutorial](https://www.postgresqltutorial.com/)
 
+## Table of Contents
+
+1. [Introduction to Database](#1-introduction-to-database)
+2. [Relational Database](#2-relational-database)
+3. [Postgres, pgAdmin Installation and Basic Commands](#3-postgres-pgadmin-installation-and-basic-commands)
+4. [Query and SQL](#4-query-and-sql)
+5. [DDL - CREATE, DROP, RENAME Database & TABLE](#5-ddl---create-drop-rename-database--table)
+6. [DML - INSERT RECORDS](#6-dml---insert-records)
+7. [DML - INSERT RECORDS](#6-dml---insert-records)
+8. [DML - INSERT RECORDS](#6-dml---insert-records)
+
 ## 1. introduction to Database
 
-### Some important terms
+PostgresSQL is the most advanced open source Database Management System.
+
+### Some important terms realted SQL
 
 - Data: unorganized & meaningless facts are known as data. example - anis, 101, 3.45, name, gpa, roll
 - Information: organized, process & meaningful facts are known as Information.
-
 - Database: An organized collection of related Data table or files for accessign and manipulating Data. Example: college db can have student, teacher table etc.
-
 - Database Management System (DBMS) : Databases are managed by Database Management Systems (DBMS), which allow users to create, read, update, and delete data efficiently.
-
 - SQL: Structured Query Language for making and processing requests to Database.
 
 ### Advantages & Disadvantages of Database
@@ -21,7 +31,7 @@
 - Advantages: faster presentation, easily accessible, update is easy, easily storable
 - Disadvantage: security issue, required skill to handle database
 
-## 2. Types of Database
+### Types of Database
 
 - Relational database: Relational Databases (SQL): Store data in tables with predefined schemas. Ideal for transactions and data integrity. Examples: MySQL, PostgresSQL, Oracle. You need ACID (Atomicity, Consistency, Isolation, Durability) compliance to ensure reliable transactions, which is critical for applications where data integrity and consistency are paramount.
 Example: E-commerce transactions, banking, and financial systems.
@@ -52,7 +62,9 @@ Your application handles big data or real-time analytics.
 - 3 important elements of RD: field=col, key-field, record=row, value
 - field vs record
 
-## 3.1 Transaction and ACID Properties
+## 2. Relational Database
+
+### 2.1 Transaction and ACID Properties
 
 - A transaction in a database is a sequence of one or more operations performed as a single logical unit of work. These operations are executed together to accomplish a specific task, and they must adhere to the ACID principles (Atomicity, Consistency, Isolation, Durability) to ensure data integrity and reliability.
 
@@ -62,7 +74,7 @@ Your application handles big data or real-time analytics.
 
 Let’s explore each ACID principle with an easy-to-understand example of a simple bank transfer scenario:
 
-### **Scenario: Bank Transfer Example**
+#### **Scenario: Bank Transfer Example**
 
 Imagine you are transferring $100 from your **Savings Account** to your **Checking Account** using an online banking system. This operation involves two main steps:
 
@@ -71,7 +83,7 @@ Imagine you are transferring $100 from your **Savings Account** to your **Checki
 
 To ensure that this transaction is handled correctly, the database needs to adhere to the ACID principles:
 
-### **1. Atomicity**
+#### **1. Atomicity**
 
 **Definition:**  
 Atomicity ensures that all parts of a transaction are completed successfully or none of them are. If any part of the transaction fails, the entire transaction is rolled back, and the system returns to its previous state.
@@ -84,7 +96,7 @@ Atomicity ensures that all parts of a transaction are completed successfully or 
 - **If Atomicity is maintained:** If the system crashes after deducting $100 from the savings account but before adding it to the checking account, the entire transaction will be rolled back, and no money will be deducted or added.
 - **Without Atomicity:** You could end up with $100 missing from your savings without it being added to your checking, leading to data inconsistency.
 
-### **2. Consistency**
+#### **2. Consistency**
 
 **Definition:**  
 Consistency ensures that a transaction takes the database from one valid state to another, adhering to all predefined rules and constraints.
@@ -97,7 +109,7 @@ Consistency ensures that a transaction takes the database from one valid state t
 - **If Consistency is maintained:** After the transfer, the combined balance of both accounts should still equal the original total amount (no money is created or lost).
 - **Without Consistency:** The accounts might show an incorrect balance, such as money disappearing or being duplicated, violating the bank’s rules.
 
-### **3. Isolation**
+#### **3. Isolation**
 
 **Definition:**  
 Isolation ensures that multiple transactions occurring at the same time do not affect each other’s execution. Each transaction should act as if it is the only one being processed.
@@ -108,7 +120,7 @@ Isolation ensures that multiple transactions occurring at the same time do not a
 - **If Isolation is maintained:** Your transfer of $100 will occur independently of the other transaction. Even if multiple transfers are happening simultaneously, each will be isolated, preventing any overlap or interference.
 - **Without Isolation:** If isolation is not maintained, you could encounter problems like one transaction overwriting the changes of another, resulting in incorrect balances.
 
-### **4. Durability**
+#### **4. Durability**
 
 **Definition:**  
 Durability ensures that once a transaction is committed, it is permanently recorded in the database, even in the case of a power failure, crash, or other disasters.
@@ -119,7 +131,7 @@ Durability ensures that once a transaction is committed, it is permanently recor
 - **If Durability is maintained:** Even if there’s a sudden power outage right after your transaction completes, the transfer will not be lost; it’s saved securely in the database.
 - **Without Durability:** A completed transaction might be lost due to unforeseen system failures, leading to missing records or incomplete data.
 
-### **Putting It All Together:**
+#### **Putting It All Together:**
 
 When you initiate a transfer of $100 between your accounts, ACID principles ensure:
 
@@ -128,11 +140,11 @@ When you initiate a transfer of $100 between your accounts, ACID principles ensu
 - **Isolation**: Other simultaneous transfers won’t interfere with your transaction.
 - **Durability**: Once completed, your transfer is saved permanently, even if there’s a system crash.
 
-### **Conclusion**
+#### **Conclusion**
 
 ACID principles are critical for ensuring reliable and consistent database operations, especially in systems where transactions must be processed accurately and safely, such as financial systems, booking platforms, and inventory management. By adhering to ACID, databases protect data integrity and provide a reliable user experience, even in complex and high-stakes environments.
 
-## 3.2 Types of Key
+### 2.2 Types of Key
 
 - Primary key: unique key. in a table you will have one primary key.
 - foreign key: one table's primary key - same other's table general key(foreign key). It is used to make relation between tables. In one table there can be multiple foreign keys.
@@ -141,7 +153,7 @@ ACID principles are critical for ensuring reliable and consistent database opera
 
 In a relational database, **keys** are crucial for organizing and managing data. They help ensure data integrity and establish relationships between different tables. In the context of an e-commerce database, different types of keys can be used to uniquely identify records, establish connections between tables, and enforce rules.
 
-### **Types of Keys in a Relational Database:**
+########### **Types of Keys in a Relational Database:**
 
 1. **Primary Key**
 2. **Foreign Key**
@@ -152,7 +164,7 @@ In a relational database, **keys** are crucial for organizing and managing data.
 
 Let's explore each type of key with examples relevant to an e-commerce database:
 
-### **1. Primary Key**
+########### **1. Primary Key**
 
 **Definition:**  
 A **primary key** is a unique identifier for a record in a table. It ensures that each record in the table is unique and can be referenced unambiguously.
@@ -179,7 +191,7 @@ CREATE TABLE Products (
 );
 ```
 
-### **2. Foreign Key**
+########### **2. Foreign Key**
 
 **Definition:**  
 A **foreign key** is a field (or collection of fields) in one table that uniquely identifies a row in another table. It creates a relationship between the two tables, enforcing referential integrity.
@@ -199,7 +211,7 @@ CREATE TABLE Orders (
 );
 ```
 
-### **3. Composite Key**
+########## **3. Composite Key**
 
 **Definition:**  
 A **composite key** is a primary key that consists of two or more columns used together to uniquely identify a record in a table.
@@ -220,7 +232,7 @@ CREATE TABLE OrderDetails (
 );
 ```
 
-### **4. Unique Key**
+######### **4. Unique Key**
 
 **Definition:**  
 A **unique key** ensures that all values in a column or a group of columns are unique across the entire table. Unlike primary keys, a table can have multiple unique keys, and they can accept a null value (but only one null if it's a single column unique key).
@@ -238,7 +250,7 @@ CREATE TABLE Customers (
 );
 ```
 
-### **5. Candidate Key**
+######## **5. Candidate Key**
 
 **Definition:**  
 A **candidate key** is a column, or a set of columns, that can uniquely identify any database record without referring to any other data. Every table can have one or more candidate keys, and out of these, one is selected as the primary key.
@@ -248,7 +260,7 @@ A **candidate key** is a column, or a set of columns, that can uniquely identify
 - **Table: Customers**
   - Both `CustomerID` and `Email` could be candidate keys, but typically, one (e.g., `CustomerID`) is chosen as the primary key.
 
-### **6. Alternate Key**
+####### **6. Alternate Key**
 
 **Definition:**  
 An **alternate key** is any candidate key that is not chosen as the primary key. It is an alternative way of uniquely identifying rows in a table.
@@ -258,7 +270,7 @@ An **alternate key** is any candidate key that is not chosen as the primary key.
 - **Table: Customers**
   - If `CustomerID` is chosen as the primary key, `Email` could be an alternate key.
 
-### **Practical Example in an E-commerce Database:**
+###### **Practical Example in an E-commerce Database:**
 
 ```sql
 CREATE TABLE Customers (
@@ -290,7 +302,7 @@ CREATE TABLE OrderDetails (
 );
 ```
 
-### **Explanation:**
+##### **Explanation:**
 
 - **Customers Table**:
   - `CustomerID` is the primary key, ensuring each customer is unique.
@@ -306,7 +318,7 @@ CREATE TABLE OrderDetails (
   - The composite key (`OrderID`, `ProductID`) ensures that each combination of order and product is unique within the table.
   - Foreign keys `OrderID` and `ProductID` link to the Orders and Products tables, respectively, establishing relationships.
 
-### **Summary:**
+#### **Summary:**
 
 In an e-commerce database:
 
@@ -318,88 +330,7 @@ In an e-commerce database:
 
 Using these keys effectively helps maintain a well-organized, reliable, and scalable database structure for an e-commerce application.
 
-## 4. Database vs DBMS
-
-- App <=> DBMS <=> Database
-- DBMS - XAMPP (Cross platform Apache, MySQL, PHP Perl)
-- first download and install the DBMS - [PostgreSQL](https://www.postgresql.org/download/)
-- after downloading check the version: `psql -version`
-- type `psql` in the command line
-- some common commands for Postgres: These are just a few examples of psql commands. You can find more commands and options by typing `\?` in the psql command-line interface to display the help menu.
-
-1. **Connect to a Database**: Connect to a specific database.
-
-   ```bash
-   \c dbname
-   ```
-
-   Replace `dbname` with the name of the database you want to connect to.
-
-2. **List Databases**: List all databases on the server.
-
-   ```bash
-   \l
-   ```
-
-3. **List Tables**: List all tables in the current database.
-
-   ```bash
-   \dt
-   ```
-
-4. **Describe Table**: Display the structure of a specific table.
-
-   ```bash
-   \d table_name
-   ```
-
-   Replace `table_name` with the name of the table you want to describe.
-
-5. **Quit psql**: Exit the psql command-line interface.
-
-   ```bash
-   \q
-   ```
-
-6. **Execute SQL File**: Execute SQL commands from a file.
-
-   ```bash
-   \i path/to/file.sql
-   ```
-
-   Replace `path/to/file.sql` with the path to your SQL file.
-
-7. **Toggle Expanded Display**: Toggle expanded display mode (shows long lines as multiple lines).
-
-   ```bash
-   \x
-   ```
-
-8. **Show Version**: Display the version of PostgreSQL.
-
-   ```bash
-   SELECT version();
-   ```
-
-   or
-
-   ```bash
-   SELECT version;
-   ```
-
-9. **List Roles**: List all roles (users) on the server.
-
-   ```bash
-   \du
-   ```
-
-10. **Change Password**: Change the password for the current user.
-
-    ```bash
-    \password
-    ```
-
-## 5. ER Model
+### 2.3 ER Model
 
 ### **What is an ER Model (Entity-Relationship Model)?**
 
@@ -504,39 +435,103 @@ Let's look at a simple ER Diagram for an e-commerce system with three entities: 
 4. **Improves Communication**: Enhances communication between database designers, developers, and business stakeholders by providing a common point of reference.
 5. **Ensures Data Integrity**: Clearly defined relationships and constraints help maintain data integrity and reduce redundancy.
 
-## 6. Sorting vs Indexing
+## 3. Postgres, pgAdmin Installation and Basic Commands
 
-- Indexing: Indexing in a database is a technique used to optimize the retrieval of data by creating data structures, called indexes, that allow for faster lookup of records. Indexes are similar to the index of a book, which helps you quickly locate information within the book.
+- [Download from here](https://www.postgresql.org/download/)
+- GUI: [pgAdmin download](https://www.pgadmin.org/download/)
+- CLI: SQL Shell (PSQL) setup
+- using in terminal: psql + Enter or psql -u postgres; you may need to copy and set the path to the environment variables
 
-Here's how indexing works and its benefits:
+### Basic commands for Postgres
 
-1. **How Indexing Works**:
-   - When you create an index on a column or set of columns in a database table, the database system creates a separate data structure that contains pointers to the actual rows in the table.
-   - These pointers are organized in a way that allows the database engine to quickly locate the rows associated with a specific value or range of values in the indexed column(s).
-   - When you query the database using a condition that matches the indexed column(s), the database engine first consults the index to find the corresponding rows, significantly reducing the time required to retrieve the data.
+- App <=> DBMS <=> Database
+- DBMS - XAMPP (Cross platform Apache, MySQL, PHP Perl)
+- first download and install the DBMS - [PostgreSQL](https://www.postgresql.org/download/)
+- after downloading check the version: `psql -version`
+- type `psql` in the command line
+- some common commands for Postgres: These are just a few examples of psql commands. You can find more commands and options by typing `\?` in the psql command-line interface to display the help menu.
 
-2. **Benefits of Indexing**:
-   - Improved Query Performance: Indexes speed up data retrieval operations, especially for queries that involve filtering, sorting, or joining data based on indexed columns.
-   - Faster Data Access: By reducing the number of disk I/O operations needed to locate data, indexes help minimize latency and improve overall system responsiveness.
-   - Enhanced Concurrency: Indexes can also improve the concurrency of database operations by reducing the time it takes to acquire locks on data pages, allowing multiple transactions to access data simultaneously.
-   - Efficient Sorting and Grouping: Indexes facilitate efficient sorting and grouping operations, making it easier to analyze and aggregate data.
+1. **Connect to a Database**: Connect to a specific database.
 
-3. **Types of Indexes**:
-   - **Single-Column Index**: An index created on a single column.
-   - **Composite Index**: An index created on multiple columns, allowing for efficient querying based on combinations of those columns.
-   - **Unique Index**: Ensures that the indexed column(s) contain unique values, preventing duplicate entries.
-   - **Clustered Index**: Defines the physical order of rows in the table based on the indexed column(s). Each table can have only one clustered index.
-   - **Non-Clustered Index**: Stores the index data separately from the table data, allowing for faster retrieval but not affecting the physical order of rows in the table.
+   ```bash
+   \c dbname
+   ```
 
-Indexing is a crucial aspect of database performance optimization. However, it's essential to strike a balance between the benefits of indexing and the overhead it imposes on data modification operations such as inserts, updates, and deletes. Over-indexing can lead to increased storage requirements and slower write operations, so it's essential to carefully consider the indexing strategy based on the specific requirements of your database application.
+   Replace `dbname` with the name of the database you want to connect to.
 
-## 7. Database security
+2. **List Databases**: List all databases on the server.
 
-- Encryption
+   ```bash
+   \l
+   ```
 
-## 8. Query
+3. **List Tables**: List all tables in the current database.
 
-A query in the context of databases refers to a request for data or information from a database table or combination of tables. It is essentially a command that is written in a structured query language (SQL) or a similar language to retrieve specific information from a database.
+   ```bash
+   \dt
+   ```
+
+4. **Describe Table**: Display the structure of a specific table.
+
+   ```bash
+   \d table_name
+   ```
+
+   Replace `table_name` with the name of the table you want to describe.
+
+5. **Quit psql**: Exit the psql command-line interface.
+
+   ```bash
+   \q
+   ```
+
+6. **Execute SQL File**: Execute SQL commands from a file.
+
+   ```bash
+   \i path/to/file.sql
+   ```
+
+   Replace `path/to/file.sql` with the path to your SQL file.
+
+7. **Toggle Expanded Display**: Toggle expanded display mode (shows long lines as multiple lines).
+
+   ```bash
+   \x
+   ```
+
+8. **Show Version**: Display the version of PostgreSQL.
+
+   ```bash
+   SELECT version();
+   ```
+
+   or
+
+   ```bash
+   SELECT version;
+   ```
+
+9. **List Roles**: List all roles (users) on the server.
+
+   ```bash
+   \du
+   ```
+
+10. **Change Password**: Change the password for the current user.
+
+    ```bash
+    \password
+    ```
+
+### Database, Schema, Table
+
+- Database => Schema => Table
+
+## 4. Query and SQL
+
+### Query
+
+A query in the context of databases refers to a request for data or information from a database table or combination of tables. It is essentially a command that is written in a structured query language (SQL) or a similar language to retrieve specific information from a database. Query Language: QUEL, QBE, SQL (Structured Query Language)
 
 Here are some common types of queries:
 
@@ -610,41 +605,36 @@ Here are some common types of queries:
    DROP TABLE employees;
    ```
 
-- Query Language: QUEL, QBE, SQL (Structured Query Language)
-
-## 9. SQL
+### SQL
 
 - Features of SQL
   - Statements are not case sensitive (SELECT / select)
   - every statement mustbe end with semicolon
 - SQL Statements types
-  - DML (DATA MANIPULATION LANGUAGE): CRUD - SELECT, INSERT, UPDATE, DELETE
-  - DDL (DATA DEFINITION LANGUAGE): CREATE, ALTER, DROP
+  - **DML (DATA MANIPULATION LANGUAGE):** CRUD - SELECT, INSERT, UPDATE, DELETE
+  - **DDL (DATA DEFINITION LANGUAGE):** CREATE, ALTER, DROP
 
-## 10. DDL (Data Definition Language)
+### DDL (Data Definition Language)
 
 - SHOW DATABASE;
 - CREATE DATABASE college;
 - DROP DATABASE college;
 - CREATE, DROP, SHOW DATABASE
 
-## 11. Data Type
+## 5. DDL - CREATE, DROP, RENAME Database & TABLE
 
-- Number - SMALLINT, INT, BIGINT, FLOAT, DOUBLE(M,D), DECIMAL(M,D)
-- Characters - CHAR(M) will take memory for whatever size defined, VARCHAR(M) will take memory for only whatever characters you have used, TEXT
-- DATE(YYYY-MM-DD), YEAR(YYYY), TIME(HH:MM:SS)
-- BLOB(BINARY LARGE OBJECT) - image, audio, video
-- LOGICAL - true/false
-
-## 12.CREATE, DROP, RENAME TABLE
-
+- **commands are not case sensitive**
+- help for psql commands `\?`
+- List all the PSQL Database `\l` or in pgAdmin `SELECT datname FROM pg_database;`
 - Create Database `CREATE DATABASE YourDatabaseName;` `CREATE DATABASE ecommerce`
+- Connect to PSQL Database `\c databaseName`
 - Drop Database `DROP DATABASE YourDatabaseName;`
+- list all the tables: `\d tableName`
 
 - syntax for creating table
 
 ```sql
--- Drop the existing order_products table
+-- Drop the existing order_products table for mysql
 DROP TABLE IF EXISTS table_name;
 
 CREATE TABLE table_name(
@@ -653,12 +643,22 @@ CREATE TABLE table_name(
   PRIMARY KEY(col_name)
   ...
   );
+
+-- Drop the existing order_products table for psql
+DROP TABLE IF EXISTS table_name;
+
+CREATE TABLE table_name(
+  col_name1 data_type(size) PRIMARY KEY,
+  col_name2 data_type(size),
+  ...
+  );
 ```
 
-- RENAME TABLE old_table_name TO new_table_name;
+- RENAME TABLE old_table_name TO new_table_name; (mysql)
+- ALTER TABLE current_table_name RENAME TO new_table_name; (psql)
 - DROP TABLE table_name;
 
-### Ecommerce Plan
+### Ecommerce Project: Create Tables
 
 For an e-commerce application, you typically need CRUD operations for various entities such as users, products, orders, and categories. Here's an outline of the CRUD operations you might need for each entity:
 
@@ -736,10 +736,12 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
     ```
 
-    SERIAL: In PostgreSQL, SERIAL is a pseudo data type that automatically generates a sequence of integers for each row inserted into the table. When you define a column as SERIAL, PostgreSQL will automatically create a sequence object and associate it with the column. This sequence generates unique integer values for the column whenever a new row is inserted into the table.
+  - SERIAL: In PostgreSQL, SERIAL is a pseudo data type that automatically generates a sequence of integers for each row inserted into the table. When you define a column as SERIAL, PostgreSQL will automatically create a sequence object and associate it with the column. This sequence generates unique integer values for the column whenever a new row is inserted into the table.
 
-     Image type: if you're storing the actual image files in the database, you might consider using a BYTEA (byte array) data type, which is suitable for storing binary data such as images. In some databases, there are specific data types designed for storing large binary objects (LOBs) like images, such as BLOB (Binary Large Object) in MySQL or BYTEA in PostgreSQL.
+  - Image type: if you're storing the actual image files in the database, you might consider using a BYTEA (byte array) data type, which is suitable for storing binary data such as images. In some databases, there are specific data types designed for storing large binary objects (LOBs) like images, such as BLOB (Binary Large Object) in MySQL or BYTEA in PostgreSQL.
 
+  - verify table creation: `\d tableName`
+  
 - **Using UUID (Universal Unique Identifier) / GUID (Globally Unique Identifier)**
     `userId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),`
 
@@ -948,7 +950,7 @@ These operations can be implemented using SQL queries or ORM (Object-Relational 
 
 - you can create your own type: `CREATE TYPE order_status AS ENUM ('Pending', 'Processing', 'Shipped', 'Delivered');`
 
-## 13. ALTER, ADD & DROP
+### ALTER, ADD & DROP
 
 - Add a new column to the table
 
@@ -989,12 +991,12 @@ ALTER COLUMN age FLOAT;
 
 Keep in mind that dropping a column will permanently remove it and all its data from the table, so be sure to use this operation carefully. Also, make sure to back up your data before performing any alterations to your database schema.
 
-## 14. Truncate Table
+### Truncate Table
 
 - Truncate table will not delete entire table just the records
 `TRUNCATE TABLE student_details` vs `DROP TABLE student_details`
 
-## 15. INSERT RECORDS
+## 6. DML - INSERT RECORDS
 
 - syntax for inserting records
 
@@ -1018,7 +1020,7 @@ Keep in mind that dropping a column will permanently remove it and all its data 
   (VAL1, VAL2, ...VALN);
   ```
 
-### An example of SQL commands to insert data into the tables we created:
+### An example of SQL commands to insert data into the tables we created
 
 - **Inserting data into the Users table**:
 
@@ -1147,7 +1149,7 @@ SELECT '2bb5c629-c822-4b73-b75b-9fe11c39495e',
 
 ```
 
-## 16. FIND / SELECT RECORDS
+## 7. DML - FIND / SELECT RECORDS
 
 - syntax for selecting records
 
@@ -1195,7 +1197,7 @@ WHERE
 
   - To disable expanded display mode and return to the default display format, simply run: `\x`
 
-## 17. SELECT and WHERE Clause
+## SELECT and WHERE Clause
 
 To perform select operations in PostgreSQL, you can use the `SELECT` statement. Here's an example of how you can retrieve data from the `Users` table:
 
@@ -1247,7 +1249,7 @@ FROM students
 WHERE city='Tampere';
 ```
 
-## 18. DISTINCT, LIMIT, ORDER BY
+## DISTINCT, LIMIT, ORDER BY
 
 - distinct command for avoiding repeated values, limit can return limited records
 
@@ -1272,7 +1274,7 @@ FROM table_name
 ORDER BY COL1, COL2,...COLN DESC ;
 ```
 
-## 16. UPDATE STATEMENT
+## 8. DML - UPDATE STATEMENT
 
 ```sql
 UPDATE table_name
@@ -1308,7 +1310,7 @@ UPDATE Orders SET Status = 'Shipped' WHERE OrderID = 123;
 
 These examples illustrate how to use `UPDATE` and `DELETE` statements to modify or remove records from the tables in your PostgreSQL database.
 
-## 19. DELETE STATEMENT
+## 9. DML - DELETE STATEMENT
 
 ```sql
 DELETE FROM table_name
@@ -1333,13 +1335,13 @@ DELETE FROM Users WHERE UserID = 1;
 DELETE FROM Orders WHERE UserID = 1;
 ```
 
-## 20. Operators
+## 10. Operators
 
 - Arithmetic operators: + - \* / %
 - Comparision or Relational operators > >= < <= = != BETWEEN
 - Logical operators: AND OR NOT IN
 
-## 21. RELATIONAL OPERTAORS IN SQL
+## 11. RELATIONAL OPERTAORS IN SQL
 
 - `SELECT * FROM Users WHERE CreatedAt > '2022-01-01';`
 
@@ -1356,7 +1358,7 @@ FROM students
 WHERE ID BETWEEN 101 AND 105;
 ```
 
-## 22. LOGICAL OPERTAORS IN SQL
+## 12. LOGICAL OPERTAORS IN SQL
 
 - OR, AND, NOT, IN, LIKE
 
@@ -1435,7 +1437,7 @@ SELECT * FROM Users WHERE CreatedAt BETWEEN '2022-01-01' AND '2022-12-31';
 
 These examples demonstrate various ways you can use the `WHERE` clause to filter records based on different conditions in your PostgreSQL queries.
 
-## 23. Custom name with AS Keyword
+## 13. Custom name with AS Keyword
 
 ```sql
 SELECT COL1 AS 'CUSTOM_NAME'
@@ -1453,7 +1455,7 @@ FROM students;
 
 `SELECT Email AS UserEmail FROM Users;`
 
-## 24. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
+## 14. SubQueries & [UPPER and LOWER Function](https://youtu.be/95wBGq9PJZQ)
 
 - Sub Queries: Query inside query
 
@@ -1462,7 +1464,7 @@ SELECT * FROM Products
 WHERE Price > (SELECT AVG(Price) FROM Products);
 ```
 
-## 25. Constraint and AUTO_INCREMENT
+## 15. Constraint and AUTO_INCREMENT
 
 - When creating table we can set constraint and auto increment
 - Constraints: NOT NULL, UNIQUE, PRIMARY KEY = NOT NULL + UNIQUE, DEFAULT
@@ -1474,7 +1476,7 @@ CREATE TABLE TABLE_NAME N(
 )
 ```
 
-## 26. [Functions](https://youtu.be/hn6P4tBRaIE)
+## 16. [Functions](https://youtu.be/hn6P4tBRaIE)
 
 - Concatenating the username and email address:
 
@@ -1529,7 +1531,7 @@ In these queries:
 
 These queries will return the user(s) with the earliest and latest registration dates, respectively, from the `Users` table.
 
-## 27. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
+## 17. [Aggregate Functions](https://youtu.be/dO2h-s8tv2g)
 
 - aggregate: one result in the end. AVG(), COUNT(), MAX(), MIN(), SUM()
 
@@ -1560,7 +1562,7 @@ SELECT MIN(Price) AS LowestPrice FROM Products;
 
 ```
 
-## 28. GroupBy
+## 18. GroupBy
 
 ```sql
 SELECT Country, COUNT(UserID) AS UserCount
@@ -1568,7 +1570,7 @@ FROM Users
 GROUP BY Country;
 ```
 
-## 29. Joining Tables
+## 19. Joining Tables
 
 ```sql
 -- create student table 
@@ -1712,7 +1714,7 @@ INNER JOIN Products p ON o.ProductId = p.ProductId
 INNER JOIN Users u ON o.UserId = u.UserId;
 ```
 
-## 30. UNION and UNION ALL, INTERSECT
+## 20. UNION and UNION ALL, INTERSECT
 
 - create 2 tables: people_visited_england and people_visited_finland
 - same number of columns and same sequences
@@ -1773,7 +1775,7 @@ Explanation:
 
 This demonstrates how the `INTERSECT` operator can be used to find the intersection of two sets of data in SQL.
 
-## 31. VIEW (Virtual Table)
+## 21. VIEW (Virtual Table)
 
 - view is a virtual table a copy of original table with the columns that you want to display
 
@@ -1800,7 +1802,7 @@ WHERE Roll=101;
 - how to insert new records to the view
 - how to delete records from the view
 
-## 32. DATE & Time
+## 22. DATE & Time
 
 ```sql
 // for mysql
@@ -1828,7 +1830,7 @@ SELECT TO_CHAR(DOB, 'Day') AS day_of_week
 FROM TableName;
 ```
 
-## 33. [Indexing](https://www.postgresqltutorial.com/postgresql-indexes/postgresql-create-index/)
+## 23. [Indexing](https://www.postgresqltutorial.com/postgresql-indexes/postgresql-create-index/)
 
 Indexing is a database optimization technique used to improve the performance of queries by allowing the database engine to quickly locate rows in a table that match certain criteria. Here are some reasons why indexing is important:
 
@@ -1935,7 +1937,7 @@ Although indexes are intended to enhance a database's performance, there are tim
 
 - Columns that are frequently manipulated should not be indexed.
 
-## 34. How to Use pgAdmin
+## 24. How to Use pgAdmin
 
 - you need to have access to psql dbms so make sure to have it already
 - download and install pgAdmin
@@ -1945,7 +1947,7 @@ Although indexes are intended to enhance a database's performance, there are tim
 - SAVE FILE
 - BROWSE OBJECT
 
-## 35. PostgreSQL REST API
+## 25. PostgreSQL REST API
 
 - PostgreSQL is a RDBMS like MySQL
 - it supports sql and json
@@ -2008,3 +2010,33 @@ WHERE condition;
 - create server
 - create a database
 - create a table
+
+## 26. Sorting vs Indexing
+
+- Indexing: Indexing in a database is a technique used to optimize the retrieval of data by creating data structures, called indexes, that allow for faster lookup of records. Indexes are similar to the index of a book, which helps you quickly locate information within the book.
+
+Here's how indexing works and its benefits:
+
+1. **How Indexing Works**:
+   - When you create an index on a column or set of columns in a database table, the database system creates a separate data structure that contains pointers to the actual rows in the table.
+   - These pointers are organized in a way that allows the database engine to quickly locate the rows associated with a specific value or range of values in the indexed column(s).
+   - When you query the database using a condition that matches the indexed column(s), the database engine first consults the index to find the corresponding rows, significantly reducing the time required to retrieve the data.
+
+2. **Benefits of Indexing**:
+   - Improved Query Performance: Indexes speed up data retrieval operations, especially for queries that involve filtering, sorting, or joining data based on indexed columns.
+   - Faster Data Access: By reducing the number of disk I/O operations needed to locate data, indexes help minimize latency and improve overall system responsiveness.
+   - Enhanced Concurrency: Indexes can also improve the concurrency of database operations by reducing the time it takes to acquire locks on data pages, allowing multiple transactions to access data simultaneously.
+   - Efficient Sorting and Grouping: Indexes facilitate efficient sorting and grouping operations, making it easier to analyze and aggregate data.
+
+3. **Types of Indexes**:
+   - **Single-Column Index**: An index created on a single column.
+   - **Composite Index**: An index created on multiple columns, allowing for efficient querying based on combinations of those columns.
+   - **Unique Index**: Ensures that the indexed column(s) contain unique values, preventing duplicate entries.
+   - **Clustered Index**: Defines the physical order of rows in the table based on the indexed column(s). Each table can have only one clustered index.
+   - **Non-Clustered Index**: Stores the index data separately from the table data, allowing for faster retrieval but not affecting the physical order of rows in the table.
+
+Indexing is a crucial aspect of database performance optimization. However, it's essential to strike a balance between the benefits of indexing and the overhead it imposes on data modification operations such as inserts, updates, and deletes. Over-indexing can lead to increased storage requirements and slower write operations, so it's essential to carefully consider the indexing strategy based on the specific requirements of your database application.
+
+## 27. Database security
+
+- Encryption
